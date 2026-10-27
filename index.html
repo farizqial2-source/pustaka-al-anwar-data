@@ -27,7 +27,8 @@
   </div>
 </nav>
 
-<main class="container mx-auto px-4 py-6 space-y-6">
+<div class="container mx-auto px-4 pt-3 flex justify-end"><button id="sync-chip" class="no-print text-xs px-3 py-1.5 rounded-full font-medium bg-gray-100 text-gray-600">☁ Menyambungkan…</button></div>
+<main class="container mx-auto px-4 py-4 space-y-6">
 
 <!-- BUKU -->
 <section id="tab-books" class="space-y-4">
@@ -225,58 +226,131 @@ const S = {
     { id: 'B002', code: 'IND-01', title: 'Bahasa Indonesia Interaktif', author: 'Sartika Dewi', stock: 3, available: 3 }
   ]),
   members: load('members', []),
-  loans: load('loans', [])
+  loans: load('loans', []),
+  updatedAt: load('updatedAt', 0)   // penanda versi data untuk sinkronisasi antar perangkat
 };
 
-// Fungsi untuk mengunggah pembaruan data ke GitHub
-let ghSyncing = false, ghTimer = null, ghAskedThisSession = false;
-async function saveToGitHub() {
-  if (ghSyncing) { clearTimeout(ghTimer); ghTimer = setTimeout(saveToGitHub, 3000); return; }
-  let token = localStorage.getItem('gh_token');
-  if (!token) {
-    if (ghAskedThisSession) return;          // jangan tanya berulang kali
-    ghAskedThisSession = true;
-    token = getGhToken();
-  }
-  if (!token) return;
+// ---------- Sinkronisasi GitHub (dua arah) ----------
+// Data disimpan di localStorage tiap perangkat DAN di database.json (repo privat).
+// Saat halaman dibuka / berpindah tab / tiap 1 menit, data terbaru dari server diambil;
+// setiap perubahan lokal dikirim ke server.
+let ghSyncing = false, ghTimer = null, ghAsked = false, ghPending = false, ghAlerted = false;
+let ghBase = +localStorage.getItem('gh_base') || 0;       // versi data terakhir yang cocok dengan server
+let ghDirty = localStorage.getItem('gh_dirty') === '1';   // ada perubahan lokal yang belum terkirim
+const setDirty = v => { ghDirty = v; try { localStorage.setItem('gh_dirty', v ? '1' : '0'); } catch (e) {} };
+const setBase = v => { ghBase = v; try { localStorage.setItem('gh_base', String(v)); } catch (e) {} };
+const ghUrl = () => `https://api.github.com/repos/${GH_CONFIG.owner}/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`;
+const b64d = t => decodeURIComponent(escape(atob(t.replace(/\s/g, ''))));
+const b64e = t => btoa(unescape(encodeURIComponent(t)));
+const countRecords = d => (d.books || []).length + (d.members || []).length + (d.loans || []).length;
 
-  const url = `https://api.github.com/repos/${GH_CONFIG.owner}/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`;
+function setSync(state, tip) {
+  const c = $('sync-chip'); if (!c) return;
+  const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  const map = {
+    ok: ['✓ Tersinkron ' + time, 'bg-emerald-100 text-emerald-800'],
+    busy: ['⟳ Menyinkronkan…', 'bg-gray-100 text-gray-600'],
+    pending: ['● Menunggu sinkron…', 'bg-amber-100 text-amber-800'],
+    off: ['☁ Belum tersambung — ketuk untuk isi token', 'bg-red-100 text-red-800'],
+    err: ['⚠ Gagal sinkron — ketuk untuk coba lagi', 'bg-red-100 text-red-800']
+  };
+  c.textContent = map[state][0]; c.title = tip || '';
+  c.className = 'no-print text-xs px-3 py-1.5 rounded-full font-medium ' + map[state][1];
+}
+
+const persistLocal = () => { try { for (const k in S) localStorage.setItem(k, JSON.stringify(S[k])); } catch (e) {} };
+function refreshUI() {
+  if (curMember) curMember = S.members.find(m => m.nisn === curMember.nisn) || null;
+  renderBooks(); renderMembers(); renderLoans(); fillPick(); showMember(); renderRecap();
+}
+function applyRemote(r) {
+  S.books = r.books || []; S.members = r.members || []; S.loans = r.loans || []; S.updatedAt = r.updatedAt || 0;
+  persistLocal(); setBase(S.updatedAt); setDirty(false); refreshUI();
+}
+// Gabungkan perubahan dua perangkat: data per ID digabung, versi lokal menang; stok dihitung ulang dari peminjaman.
+function mergeData(remote, local) {
+  const union = (a, b, key, pick) => {
+    const m = new Map(); (a || []).forEach(x => m.set(x[key], x));
+    (b || []).forEach(x => m.set(x[key], pick && m.has(x[key]) ? pick(m.get(x[key]), x) : x));
+    return [...m.values()];
+  };
+  const rank = l => l.status === 'Dikembalikan' ? 1 : 0;
+  const loans = union(remote.loans, local.loans, 'id', (r, l) => rank(r) > rank(l) ? r : l).sort((a, b) => loanTs(b) - loanTs(a));
+  const active = {}; loans.forEach(l => { if (l.status === 'Dipinjam') active[l.bookId] = (active[l.bookId] || 0) + 1; });
+  const books = union(remote.books, local.books, 'id').map(b => ({ ...b, available: Math.max(0, (+b.stock || 0) - (active[b.id] || 0)) }));
+  S.books = books; S.members = union(remote.members, local.members, 'nisn'); S.loans = loans;
+}
+
+async function ghGet(token) {
   const headers = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' };
-  ghSyncing = true;
-  try {
-    let sha;
-    const getRes = await fetch(url, { headers });
-    if (getRes.ok) sha = (await getRes.json()).sha;
-    else if (getRes.status !== 404) throw new Error('GET ' + getRes.status);
+  const res = await fetch(ghUrl(), { headers, cache: 'no-store' });
+  if (res.status === 404) return { remote: null, sha: undefined };
+  if (!res.ok) throw new Error('GET ' + res.status);
+  const j = await res.json();
+  const text = j.content ? b64d(j.content)
+    : await (await fetch(ghUrl(), { headers: { ...headers, 'Accept': 'application/vnd.github.raw+json' }, cache: 'no-store' })).text();
+  let remote; try { remote = JSON.parse(text); } catch (e) { throw new Error('Isi database.json tidak valid'); }
+  return { remote, sha: j.sha };
+}
 
-    const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(S, null, 2))));
-    const putRes = await fetch(url, {
-      method: 'PUT',
-      headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Update otomatis data perpustakaan dari web', content: contentEncoded, sha })
-    });
-    if (!putRes.ok) throw new Error('PUT ' + putRes.status);
+async function syncGitHub(manual = false) {
+  if (ghSyncing) { ghPending = true; return; }
+  let token = localStorage.getItem('gh_token');
+  if (!token && (manual || !ghAsked)) { ghAsked = true; token = getGhToken(); }
+  if (!token) return setSync('off');
+  ghSyncing = true; setSync('busy');
+  try {
+    let done = false;
+    for (let n = 0; n < 3 && !done; n++) {
+      const startTs = S.updatedAt;
+      const { remote, sha } = await ghGet(token);
+      if (S.updatedAt !== startTs) continue;                // ada perubahan lokal saat mengambil data → ulangi
+      let push = false;
+      if (!remote) push = true;
+      else {
+        const R = remote.updatedAt || 0;
+        if (R === 0 && ghBase === 0) {                      // server berisi data versi lama: pakai yang lebih lengkap
+          if (countRecords(S) > countRecords(remote)) push = true; else applyRemote(remote);
+        } else if (R === ghBase) push = ghDirty;            // server tidak berubah sejak sinkron terakhir
+        else if (!ghDirty) applyRemote(remote);             // perangkat lain mengubah data → ambil
+        else { mergeData(remote, S); S.updatedAt = Date.now(); persistLocal(); push = true; }   // dua-duanya berubah → gabung
+      }
+      if (push) {
+        if (!S.updatedAt) { S.updatedAt = Date.now(); persistLocal(); }
+        const sent = S.updatedAt;
+        const res = await fetch(ghUrl(), {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Update otomatis data perpustakaan dari web', content: b64e(JSON.stringify(S, null, 2)), sha })
+        });
+        if (res.status === 409 || res.status === 422) continue;   // server berubah di tengah jalan → ulangi dari awal
+        if (!res.ok) throw new Error('PUT ' + res.status);
+        setBase(sent);
+        if (S.updatedAt === sent) setDirty(false); else ghPending = true;
+      }
+      done = true;
+    }
+    if (!done) throw new Error('Sinkronisasi berulang kali bentrok');
+    ghAlerted = false; setSync('ok');
   } catch (err) {
     console.error('Gagal menyinkronkan data ke GitHub:', err);
-    if (/ 401| 403/.test(err.message)) {       // token salah/kedaluwarsa
-      localStorage.removeItem('gh_token');
-      ghAskedThisSession = false;
-      alert('Token GitHub ditolak. Data tetap aman di perangkat ini. Muat ulang halaman untuk memasukkan token baru.');
-    }
+    if (/ 401| 403/.test(err.message)) {
+      localStorage.removeItem('gh_token'); ghAsked = false; setSync('off', err.message);
+      if (!ghAlerted) { ghAlerted = true; alert('Token GitHub ditolak atau kedaluwarsa. Data tetap aman di perangkat ini. Ketuk tanda merah di atas untuk memasukkan token baru.'); }
+    } else if (/ 404/.test(err.message)) {
+      setSync('err', 'Repo atau file tidak ditemukan. Pastikan nama repo benar dan token punya akses ke repo tersebut.');
+    } else setSync('err', err.message);
   } finally {
     ghSyncing = false;
+    if (ghPending) { ghPending = false; setTimeout(() => syncGitHub(), 500); }
   }
 }
 
-const saveDebounced = () => { clearTimeout(ghTimer); ghTimer = setTimeout(saveToGitHub, 2000); };
+const saveDebounced = () => { if (localStorage.getItem('gh_token')) setSync('pending'); clearTimeout(ghTimer); ghTimer = setTimeout(() => syncGitHub(), 2000); };
 
-const save = () => { 
-  try { 
-    for (const k in S) {
-      localStorage.setItem(k, JSON.stringify(S[k])); 
-    }
-    saveDebounced(); // Kirim ke GitHub (ditunda 2 detik)
-  } catch (e) {} 
+const save = () => {
+  S.updatedAt = Date.now(); setDirty(true); persistLocal();
+  saveDebounced();   // kirim ke GitHub (ditunda 2 detik)
 };
 
 const $ = id => document.getElementById(id);
@@ -712,6 +786,13 @@ function stopCam() {
 }
 
 switchTab('books');
+
+// Sinkronisasi saat halaman dibuka, saat kembali ke tab/aplikasi, saat online lagi, dan tiap 1 menit
+$('sync-chip').onclick = () => syncGitHub(true);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncGitHub(); });
+window.addEventListener('online', () => syncGitHub());
+setInterval(() => { if (!document.hidden) syncGitHub(); }, 60000);
+syncGitHub();
 </script>
 </body>
 </html>

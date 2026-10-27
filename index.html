@@ -8,7 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <!-- Pustaka ZXing untuk pemindaian barcode/QR via kamera yang handal di smartphone -->
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
-<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{background:#f9fafb}</style>
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{background:#f9fafb}@media print{nav,.no-print{display:none!important}body{background:#fff}}</style>
 </head>
 <body class="font-sans text-gray-700">
 <nav class="bg-indigo-600 text-white shadow-lg">
@@ -22,6 +22,7 @@
       <button data-tab="books" class="tabbtn px-4 py-2 rounded-lg font-medium">Buku</button>
       <button data-tab="members" class="tabbtn px-4 py-2 rounded-lg font-medium">Anggota</button>
       <button data-tab="loans" class="tabbtn px-4 py-2 rounded-lg font-medium">Peminjaman</button>
+      <button data-tab="recap" class="tabbtn px-4 py-2 rounded-lg font-medium">Rekap</button>
     </div>
   </div>
 </nav>
@@ -51,7 +52,7 @@
         <button onclick="openMember()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium">+ Tambah Manual</button>
       </div>
     </div>
-    <input type="file" id="xl-file" accept=".xlsx,.xls/.csv" class="hidden">
+    <input type="file" id="xl-file" accept=".xlsx,.xls,.csv" class="hidden">
     <p class="text-xs text-gray-500">File Excel (.xlsx/.xls/.csv) baris pertama berisi judul kolom: <b>Nama</b>, <b>NISN</b> (untuk guru boleh <b>NIP</b>), serta opsional <b>Peran</b> (Siswa/Guru) dan <b>Kelas</b>. Jika kolom Peran kosong, kolom NIP otomatis dianggap Guru, selebihnya Siswa. Impor ulang akan memperbarui data dengan NISN yang sama.</p>
     <input id="m-search" placeholder="Cari nama / NISN…" class="w-full border rounded-lg px-3 py-2 text-sm">
   </div>
@@ -96,6 +97,50 @@
     <table class="w-full text-left text-sm"><thead class="bg-gray-50 text-gray-600 uppercase text-xs"><tr>
       <th class="p-4">Peminjam</th><th class="p-4">Judul Buku</th><th class="p-4 text-center">Tanggal</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Aksi</th>
     </tr></thead><tbody id="loan-body" class="divide-y"></tbody></table>
+  </div>
+</section>
+<!-- REKAP -->
+<section id="tab-recap" class="space-y-4 hidden">
+  <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
+    <div class="no-print flex flex-wrap justify-between items-center gap-2">
+      <div><h2 class="text-xl font-bold text-gray-800">Rekap Perpustakaan</h2><p class="text-xs text-gray-500 mt-1">Ringkasan dan daftar lengkap buku, anggota, serta peminjaman &amp; pengembalian. Dapat diekspor ke Excel atau CSV.</p></div>
+      <button onclick="exportAll()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium">⬇ Ekspor Semua (Excel)</button>
+    </div>
+    <div id="recap-stats" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+  </div>
+
+  <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
+    <div class="no-print flex flex-wrap gap-2 border-b pb-3">
+      <button data-r="books" class="recapbtn px-4 py-2 rounded-lg text-sm font-medium">Daftar Buku</button>
+      <button data-r="members" class="recapbtn px-4 py-2 rounded-lg text-sm font-medium">Daftar Anggota</button>
+      <button data-r="loans" class="recapbtn px-4 py-2 rounded-lg text-sm font-medium">Peminjaman &amp; Pengembalian</button>
+    </div>
+    <div class="no-print flex flex-wrap items-end gap-3">
+      <div class="flex-1 min-w-[200px]"><label class="block text-xs font-medium mb-1">Cari</label><input id="r-search" autocomplete="off" placeholder="Cari…" class="w-full border rounded-lg px-3 py-2 text-sm"></div>
+      <div id="r-role-wrap" class="hidden"><label class="block text-xs font-medium mb-1">Peran</label><select id="r-role" class="border rounded-lg px-3 py-2 text-sm"><option value="">Semua</option><option>Siswa</option><option>Guru</option></select></div>
+      <div id="r-loan-wrap" class="hidden">
+        <div class="flex flex-wrap items-end gap-3">
+          <div><label class="block text-xs font-medium mb-1">Status</label><select id="r-status" class="border rounded-lg px-3 py-2 text-sm"><option value="">Semua</option><option value="Dipinjam">Dipinjam</option><option value="Dikembalikan">Dikembalikan</option></select></div>
+          <div><label class="block text-xs font-medium mb-1">Dipinjam dari</label><input id="r-from" type="date" class="border rounded-lg px-3 py-2 text-sm"></div>
+          <div><label class="block text-xs font-medium mb-1">Sampai</label><input id="r-to" type="date" class="border rounded-lg px-3 py-2 text-sm"></div>
+        </div>
+      </div>
+      <button onclick="resetRecapFilters()" class="text-sm text-indigo-700 underline pb-2">Reset filter</button>
+    </div>
+    <div class="no-print flex flex-wrap justify-between items-center gap-2">
+      <span id="r-count" class="text-sm text-gray-500"></span>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="exportRecap('xlsx')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium">⬇ Excel (.xlsx)</button>
+        <button onclick="exportRecap('csv')" class="bg-white hover:bg-gray-50 border px-4 py-2 rounded-lg text-sm font-medium">⬇ CSV</button>
+        <button onclick="window.print()" class="bg-white hover:bg-gray-50 border px-4 py-2 rounded-lg text-sm font-medium">🖨 Cetak</button>
+      </div>
+    </div>
+    <p class="no-print text-xs text-gray-400">Ekspor mengikuti pencarian dan filter yang sedang aktif. Gunakan Excel (.xlsx) agar NISN/NIP berawalan 0 tidak hilang.</p>
+    <div id="print-title" class="hidden print:block text-lg font-bold text-gray-800"></div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
+    <table class="w-full text-left text-sm"><thead id="recap-head" class="bg-gray-50 text-gray-600 uppercase text-xs"></thead><tbody id="recap-body" class="divide-y"></tbody></table>
   </div>
 </section>
 </main>
@@ -232,9 +277,9 @@ const showModal = id => { $(id).classList.remove('hidden'); $(id).classList.add(
 
 // ---------- Tab ----------
 function switchTab(t) {
-  ['books', 'members', 'loans'].forEach(x => $('tab-' + x).classList.toggle('hidden', x !== t));
+  ['books', 'members', 'loans', 'recap'].forEach(x => $('tab-' + x).classList.toggle('hidden', x !== t));
   document.querySelectorAll('.tabbtn').forEach(b => b.classList.toggle('bg-indigo-700', b.dataset.tab === t));
-  if (t === 'books') renderBooks(); if (t === 'members') renderMembers();
+  if (t === 'books') renderBooks(); if (t === 'members') renderMembers(); if (t === 'recap') renderRecap();
   if (t === 'loans') { renderLoans(); fillPick(); $(curMember ? 'scan-book' : 'scan-member').focus(); }
 }
 document.querySelectorAll('.tabbtn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
@@ -376,7 +421,7 @@ function doLoan(book) {
   if (S.loans.some(l => l.nisn === curMember.nisn && l.bookId === book.id && l.status === 'Dipinjam')) return msg('Anggota ini sudah meminjam buku tersebut.', false);
   book.available--;
   S.loans.unshift({ id: 'L' + Date.now(), nisn: curMember.nisn, borrower: curMember.name + ' (' + curMember.role + ')', bookId: book.id, bookTitle: book.title,
-    date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), status: 'Dipinjam' });
+    date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), ts: Date.now(), status: 'Dipinjam' });
   save(); renderLoans(); fillPick(); showMember(); msg('Berhasil: "' + book.title + '" dipinjam oleh ' + curMember.name + '.', true);
 }
 $('scan-member').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); setMember(e.target.value); } };
@@ -398,9 +443,154 @@ function renderLoans() {
 }
 function returnBook(id) {
   const l = S.loans.find(x => x.id === id); if (!l || !confirm('Konfirmasi pengembalian buku ini?')) return;
-  l.status = 'Dikembalikan';
+  l.status = 'Dikembalikan'; l.returnTs = Date.now();
+  l.returnDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   const b = S.books.find(x => x.id === l.bookId); if (b) b.available++;
   save(); renderLoans(); fillPick(); showMember();
+}
+
+// ---------- Rekap ----------
+let recapTab = 'books';
+const RECAP_COLS = {
+  books: ['Kode', 'Judul', 'Penulis', 'Stok', 'Tersedia', 'Sedang Dipinjam', 'Total Dipinjam'],
+  members: ['NISN / NIP', 'Nama', 'Peran', 'Kelas', 'Sedang Meminjam', 'Total Peminjaman'],
+  loans: ['No', 'NISN / NIP', 'Nama Peminjam', 'Peran', 'Kelas', 'Kode Buku', 'Judul Buku', 'Tanggal Pinjam', 'Tanggal Kembali', 'Status']
+};
+const RECAP_NAMES = { books: 'Daftar Buku', members: 'Daftar Anggota', loans: 'Peminjaman & Pengembalian' };
+const RECAP_FILE = { books: 'Buku', members: 'Anggota', loans: 'Peminjaman' };
+const RECAP_CENTER = new Set(['No', 'Stok', 'Tersedia', 'Sedang Dipinjam', 'Total Dipinjam', 'Sedang Meminjam', 'Total Peminjaman', 'Tanggal Pinjam', 'Tanggal Kembali', 'Status']);
+const MONTHS_ID = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
+const fmtDate = ts => new Date(ts).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+// Data lama hanya menyimpan tanggal teks ("27 Oktober 2026"); data baru juga menyimpan ts.
+function loanTs(l) {
+  if (l.ts) return l.ts;
+  const m = String(l.date || '').toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+  const mi = m ? MONTHS_ID.indexOf(m[2]) : -1;
+  return mi >= 0 ? new Date(+m[3], mi, +m[1]).getTime() : 0;
+}
+
+function recapStats() {
+  const act = S.loans.filter(l => l.status === 'Dipinjam').length;
+  const siswa = S.members.filter(m => m.role !== 'Guru').length;
+  return [
+    { label: 'Judul Buku', value: S.books.length, sub: '' },
+    { label: 'Total Eksemplar', value: S.books.reduce((a, b) => a + (+b.stock || 0), 0), sub: S.books.reduce((a, b) => a + (+b.available || 0), 0) + ' tersedia' },
+    { label: 'Anggota', value: S.members.length, sub: siswa + ' siswa · ' + (S.members.length - siswa) + ' guru' },
+    { label: 'Sedang Dipinjam', value: act, sub: '' },
+    { label: 'Sudah Dikembalikan', value: S.loans.length - act, sub: '' },
+    { label: 'Total Transaksi', value: S.loans.length, sub: '' }
+  ];
+}
+
+// all = true → abaikan pencarian/filter (dipakai untuk "Ekspor Semua")
+function recapData(kind, all = false) {
+  const q = all ? '' : norm($('r-search').value);
+  const has = (...v) => !q || v.some(x => norm(x).includes(q));
+  let rows = [];
+  if (kind === 'books') {
+    const act = {}, tot = {};
+    S.loans.forEach(l => { tot[l.bookId] = (tot[l.bookId] || 0) + 1; if (l.status === 'Dipinjam') act[l.bookId] = (act[l.bookId] || 0) + 1; });
+    rows = S.books.filter(b => has(b.code, b.title, b.author)).map(b => ({
+      'Kode': b.code, 'Judul': b.title, 'Penulis': b.author, 'Stok': b.stock, 'Tersedia': b.available,
+      'Sedang Dipinjam': act[b.id] || 0, 'Total Dipinjam': tot[b.id] || 0
+    }));
+  } else if (kind === 'members') {
+    const role = all ? '' : $('r-role').value;
+    const act = {}, tot = {};
+    S.loans.forEach(l => { tot[l.nisn] = (tot[l.nisn] || 0) + 1; if (l.status === 'Dipinjam') act[l.nisn] = (act[l.nisn] || 0) + 1; });
+    rows = S.members.filter(m => (!role || m.role === role) && has(m.nisn, m.name, m.kelas))
+      .slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'id'))
+      .map(m => ({
+        'NISN / NIP': m.nisn, 'Nama': m.name, 'Peran': m.role, 'Kelas': m.kelas || '-',
+        'Sedang Meminjam': act[m.nisn] || 0, 'Total Peminjaman': tot[m.nisn] || 0
+      }));
+  } else {
+    const st = all ? '' : $('r-status').value;
+    const from = all || !$('r-from').value ? 0 : new Date($('r-from').value + 'T00:00:00').getTime();
+    const to = all || !$('r-to').value ? 0 : new Date($('r-to').value + 'T23:59:59').getTime();
+    const mm = {}, bm = {};
+    S.members.forEach(m => mm[m.nisn] = m); S.books.forEach(b => bm[b.id] = b);
+    rows = S.loans.filter(l => {
+      const t = loanTs(l);
+      if (st && l.status !== st) return false;
+      if (from && t < from) return false;
+      if (to && t > to) return false;
+      return has(l.nisn, l.borrower, l.bookTitle, bm[l.bookId] && bm[l.bookId].code);
+    }).map((l, i) => {
+      const m = mm[l.nisn], b = bm[l.bookId], br = String(l.borrower || '');
+      const rm = br.match(/\((Siswa|Guru)\)\s*$/);
+      return {
+        'No': i + 1, 'NISN / NIP': l.nisn, 'Nama Peminjam': m ? m.name : br.replace(/\s*\((Siswa|Guru)\)\s*$/, ''),
+        'Peran': m ? m.role : (rm ? rm[1] : '-'), 'Kelas': (m && m.kelas) || '-', 'Kode Buku': b ? b.code : '-',
+        'Judul Buku': l.bookTitle, 'Tanggal Pinjam': l.date || '-', 'Tanggal Kembali': l.returnDate || '-', 'Status': l.status
+      };
+    });
+  }
+  return { cols: RECAP_COLS[kind], rows };
+}
+
+function renderRecap() {
+  document.querySelectorAll('.recapbtn').forEach(b => {
+    const on = b.dataset.r === recapTab;
+    b.classList.toggle('bg-indigo-600', on); b.classList.toggle('text-white', on);
+    b.classList.toggle('bg-gray-100', !on); b.classList.toggle('text-gray-700', !on);
+  });
+  $('r-role-wrap').classList.toggle('hidden', recapTab !== 'members');
+  $('r-loan-wrap').classList.toggle('hidden', recapTab !== 'loans');
+  $('recap-stats').innerHTML = recapStats().map(c => `<div class="border rounded-xl p-3">
+    <div class="text-xs text-gray-500">${esc(c.label)}</div><div class="text-2xl font-bold text-indigo-600">${c.value}</div>
+    <div class="text-xs text-gray-400 min-h-[1rem]">${esc(c.sub)}</div></div>`).join('');
+
+  const { cols, rows } = recapData(recapTab);
+  $('r-count').textContent = rows.length + ' baris';
+  $('print-title').textContent = 'Rekap ' + RECAP_NAMES[recapTab] + ' — Perpustakaan Al Anwar — ' + fmtDate(Date.now());
+  $('recap-head').innerHTML = '<tr>' + cols.map(c => `<th class="p-4 ${RECAP_CENTER.has(c) ? 'text-center' : ''}">${esc(c)}</th>`).join('') + '</tr>';
+  $('recap-body').innerHTML = rows.length ? rows.map(r => '<tr class="hover:bg-gray-50">' + cols.map((c, i) => {
+    const v = r[c], cls = 'p-4 ' + (RECAP_CENTER.has(c) ? 'text-center ' : '');
+    if (c === 'Status') return `<td class="${cls}"><span class="px-2 py-0.5 rounded-full text-xs ${v === 'Dipinjam' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${esc(v)}</span></td>`;
+    return `<td class="${cls}${i === 0 && c !== 'No' ? 'font-mono' : ''}">${esc(v)}</td>`;
+  }).join('') + '</tr>').join('')
+    : `<tr><td colspan="${cols.length}" class="p-6 text-center text-gray-400">Tidak ada data yang cocok.</td></tr>`;
+}
+
+function resetRecapFilters() {
+  ['r-search', 'r-role', 'r-status', 'r-from', 'r-to'].forEach(id => $(id).value = '');
+  renderRecap();
+}
+['r-search', 'r-role', 'r-status', 'r-from', 'r-to'].forEach(id => $(id).addEventListener('input', renderRecap));
+document.querySelectorAll('.recapbtn').forEach(b => b.onclick = () => { recapTab = b.dataset.r; renderRecap(); });
+
+// ---------- Ekspor Rekap ----------
+const stamp = () => new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
+function recapSheet(kind, all) {
+  const { cols, rows } = recapData(kind, all);
+  const ws = XLSX.utils.json_to_sheet(rows, { header: cols });
+  ws['!cols'] = cols.map(c => ({ wch: Math.min(45, rows.reduce((m, r) => Math.max(m, String(r[c] ?? '').length), c.length) + 2) }));
+  return { ws, n: rows.length };
+}
+function exportRecap(ext) {
+  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.');
+  const { ws, n } = recapSheet(recapTab, false);
+  if (!n) return alert('Tidak ada data untuk diekspor.');
+  const name = `Rekap_${RECAP_FILE[recapTab]}_${stamp()}`;
+  if (ext === 'csv') {
+    const blob = new Blob(['\uFEFF' + XLSX.utils.sheet_to_csv(ws)], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + '.csv';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } else {
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, RECAP_NAMES[recapTab]);
+    XLSX.writeFile(wb, name + '.xlsx');
+  }
+}
+function exportAll() {
+  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.');
+  const wb = XLSX.utils.book_new();
+  const sum = recapStats().map(c => ({ 'Keterangan': c.label, 'Jumlah': c.value, 'Catatan': c.sub }));
+  const wsSum = XLSX.utils.json_to_sheet(sum, { header: ['Keterangan', 'Jumlah', 'Catatan'] });
+  wsSum['!cols'] = [{ wch: 24 }, { wch: 10 }, { wch: 24 }];
+  XLSX.utils.book_append_sheet(wb, wsSum, 'Ringkasan');
+  ['books', 'members', 'loans'].forEach(k => XLSX.utils.book_append_sheet(wb, recapSheet(k, true).ws, RECAP_NAMES[k]));
+  XLSX.writeFile(wb, `Rekap_Perpustakaan_${stamp()}.xlsx`);
 }
 
 // ---------- Scan Kamera dengan ZXing BrowserMultiFormatReader ----------

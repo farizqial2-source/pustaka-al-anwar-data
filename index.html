@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pustaka Sekolah</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Pustaka ZXing untuk pemindaian barcode/QR via kamera yang handal di smartphone -->
+<script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{background:#f9fafb}</style>
+</head>
+<body class="font-sans text-gray-700">
+<nav class="bg-indigo-600 text-white shadow-lg">
+  <div class="container mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+    <div class="flex items-center gap-3">
+      <!-- Logo Yayasan Al-Anwar -->
+      <img src="Logo Yayasan.png" alt="Logo Yayasan Al-Anwar" class="w-10 h-10">
+      <span class="text-xl font-bold"> Perpustakaan Al Anwar</span>
+    </div>
+    <div class="flex gap-2 text-sm">
+      <button data-tab="books" class="tabbtn px-4 py-2 rounded-lg font-medium">Buku</button>
+      <button data-tab="members" class="tabbtn px-4 py-2 rounded-lg font-medium">Anggota</button>
+      <button data-tab="loans" class="tabbtn px-4 py-2 rounded-lg font-medium">Peminjaman</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container mx-auto px-4 py-6 space-y-6">
+
+<!-- BUKU -->
+<section id="tab-books" class="space-y-4">
+  <div class="flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border">
+    <div><h2 class="text-xl font-bold text-gray-800">Manajemen Buku</h2><p class="text-xs text-gray-500 mt-1 max-w-xl">Impor daftar buku dari Excel (.xlsx/.xls/.csv). Baris pertama berisi judul kolom: <b>Kode</b>, <b>Judul</b>, <b>Penulis</b>, <b>Stok</b>. Kode yang sudah ada akan diperbarui, yang baru akan ditambahkan.</p></div>
+    <div class="flex gap-2"><button onclick="document.getElementById('bk-file').click()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium">⬆ Impor dari Excel</button><button onclick="openBook()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium">+ Tambah Buku</button></div><input type="file" id="bk-file" accept=".xlsx,.xls,.csv" class="hidden">
+  </div>
+  <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
+    <table class="w-full text-left text-sm"><thead class="bg-gray-50 text-gray-600 uppercase text-xs"><tr>
+      <th class="p-4">Kode</th><th class="p-4">Judul</th><th class="p-4">Penulis</th><th class="p-4 text-center">Stok</th><th class="p-4 text-center">Tersedia</th><th class="p-4 text-center">Aksi</th>
+    </tr></thead><tbody id="book-body" class="divide-y"></tbody></table>
+  </div>
+</section>
+
+<!-- ANGGOTA -->
+<section id="tab-members" class="space-y-4 hidden">
+  <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
+    <div class="flex flex-wrap justify-between items-center gap-2">
+      <h2 class="text-xl font-bold text-gray-800">Data Siswa &amp; Guru</h2>
+      <div class="flex gap-2">
+        <button onclick="document.getElementById('xl-file').click()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium">⬆ Impor dari Excel</button>
+        <button onclick="openMember()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium">+ Tambah Manual</button>
+      </div>
+    </div>
+    <input type="file" id="xl-file" accept=".xlsx,.xls/.csv" class="hidden">
+    <p class="text-xs text-gray-500">File Excel (.xlsx/.xls/.csv) baris pertama berisi judul kolom: <b>Nama</b>, <b>NISN</b> (untuk guru boleh <b>NIP</b>), serta opsional <b>Peran</b> (Siswa/Guru) dan <b>Kelas</b>. Jika kolom Peran kosong, kolom NIP otomatis dianggap Guru, selebihnya Siswa. Impor ulang akan memperbarui data dengan NISN yang sama.</p>
+    <input id="m-search" placeholder="Cari nama / NISN…" class="w-full border rounded-lg px-3 py-2 text-sm">
+  </div>
+  <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
+    <table class="w-full text-left text-sm"><thead class="bg-gray-50 text-gray-600 uppercase text-xs"><tr>
+      <th class="p-4">NISN / NIP</th><th class="p-4">Nama</th><th class="p-4">Peran</th><th class="p-4">Kelas</th><th class="p-4 text-center">Aksi</th>
+    </tr></thead><tbody id="member-body" class="divide-y"></tbody></table>
+  </div>
+</section>
+
+<!-- PEMINJAMAN -->
+<section id="tab-loans" class="space-y-4 hidden">
+  <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
+    <h2 class="text-xl font-bold text-gray-800">Peminjaman dengan Scan Barcode</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">1. Scan barcode kartu (NISN / NIP)</label>
+        <div class="flex gap-2">
+          <input id="scan-member" autocomplete="off" placeholder="Arahkan scanner lalu tekan Enter" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+          <button onclick="startCam('member')" title="Scan dengan kamera" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg flex items-center justify-center shadow-sm">📷 Scan</button>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">2. Scan barcode buku (kode buku)</label>
+        <div class="flex gap-2">
+          <input id="scan-book" autocomplete="off" placeholder="Kode buku lalu Enter" class="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+          <button onclick="startCam('book')" title="Scan dengan kamera" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg flex items-center justify-center shadow-sm">📷 Scan</button>
+        </div>
+        <div class="flex gap-2 mt-2">
+          <select id="pick-book" class="flex-1 border rounded-lg px-2 py-1.5 text-sm"></select>
+          <button onclick="loanFromSelect()" class="bg-green-600 hover:bg-green-700 text-white px-3 rounded-lg text-sm">Pinjam</button>
+        </div>
+      </div>
+    </div>
+    <div id="member-card" class="hidden bg-indigo-50 border border-indigo-200 rounded-lg p-4 flex justify-between items-center">
+      <div id="member-info"></div>
+      <button onclick="clearMember()" class="text-sm text-indigo-700 underline">Ganti peminjam</button>
+    </div>
+    <div id="scan-msg" class="hidden text-sm rounded-lg px-4 py-2"></div>
+  </div>
+  <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
+    <table class="w-full text-left text-sm"><thead class="bg-gray-50 text-gray-600 uppercase text-xs"><tr>
+      <th class="p-4">Peminjam</th><th class="p-4">Judul Buku</th><th class="p-4 text-center">Tanggal</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Aksi</th>
+    </tr></thead><tbody id="loan-body" class="divide-y"></tbody></table>
+  </div>
+</section>
+</main>
+
+<!-- Modal buku -->
+<div id="book-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+  <form onsubmit="saveBook(event)" class="bg-white rounded-xl max-w-md w-full p-6 space-y-3">
+    <h3 id="book-title-h" class="text-xl font-bold"></h3>
+    <input type="hidden" id="b-id">
+    <input id="b-code" required placeholder="Kode buku (sesuai barcode)" class="w-full border rounded-lg px-3 py-2">
+    <input id="b-title" required placeholder="Judul buku" class="w-full border rounded-lg px-3 py-2">
+    <input id="b-author" required placeholder="Penulis" class="w-full border rounded-lg px-3 py-2">
+    <input id="b-stock" type="number" min="1" required placeholder="Jumlah stok" class="w-full border rounded-lg px-3 py-2">
+    <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeModal('book-modal')" class="bg-gray-200 px-4 py-2 rounded-lg">Batal</button><button class="bg-indigo-600 text-white px-4 py-2 rounded-lg">Simpan</button></div>
+  </form>
+</div>
+
+<!-- Modal anggota -->
+<div id="member-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+  <form onsubmit="saveMember(event)" class="bg-white rounded-xl max-w-md w-full p-6 space-y-3">
+    <h3 id="member-title-h" class="text-xl font-bold"></h3>
+    <input type="hidden" id="m-old">
+    <input id="m-nisn" required placeholder="NISN / NIP" class="w-full border rounded-lg px-3 py-2">
+    <input id="m-name" required placeholder="Nama lengkap" class="w-full border rounded-lg px-3 py-2">
+    <select id="m-role" class="w-full border rounded-lg px-3 py-2"><option>Siswa</option><option>Guru</option></select>
+    <input id="m-class" placeholder="Kelas (opsional)" class="w-full border rounded-lg px-3 py-2">
+    <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeModal('member-modal')" class="bg-gray-200 px-4 py-2 rounded-lg">Batal</button><button class="bg-indigo-600 text-white px-4 py-2 rounded-lg">Simpan</button></div>
+  </form>
+</div>
+
+<!-- Modal Kamera / Pemindai ZXing -->
+<div id="cam-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+    <div class="flex justify-between items-center">
+      <h3 id="cam-title" class="text-lg font-bold text-gray-800">Pindai Barcode</h3>
+      <button onclick="stopCam()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+    </div>
+    <div class="relative overflow-hidden rounded-xl bg-black aspect-[4/3] flex items-center justify-center">
+      <video id="cam-video" class="w-full h-full object-cover"></video>
+      <div class="absolute inset-0 border-2 border-dashed border-indigo-400/70 m-8 rounded-lg pointer-events-none flex items-center justify-center">
+        <div class="w-full h-0.5 bg-red-500/80 animate-pulse"></div>
+      </div>
+    </div>
+    <p class="text-xs text-center text-gray-500">Arahkan kamera ke barcode kartu anggota atau buku di dalam kotak.</p>
+    <button onclick="stopCam()" class="bg-gray-200 hover:bg-gray-300 font-medium px-4 py-2.5 rounded-xl w-full text-gray-700 text-sm">Tutup Kamera</button>
+  </div>
+</div>
+
+<script>
+// ---------- Konfigurasi GitHub API ----------
+const GH_CONFIG = {
+  owner: 'farizqial2-source',
+  repo: 'pustaka-al-anwar-db',
+  path: 'database.json'
+};
+
+// Token disimpan hanya di perangkat petugas (bukan di kode)
+function getGhToken(forcePrompt = false) {
+  let t = forcePrompt ? null : localStorage.getItem('gh_token');
+  if (!t) {
+    t = prompt('Masukkan token GitHub (hanya disimpan di perangkat ini):');
+    if (t) localStorage.setItem('gh_token', t.trim());
+  }
+  return t ? t.trim() : null;
+}
+
+// ---------- Penyimpanan (Local Storage & GitHub Sync) ----------
+const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+const S = {
+  books: load('books', [
+    { id: 'B001', code: 'MAT-01', title: 'Matematika Kelas X', author: 'Tim Kemdikbud', stock: 5, available: 5 },
+    { id: 'B002', code: 'IND-01', title: 'Bahasa Indonesia Interaktif', author: 'Sartika Dewi', stock: 3, available: 3 }
+  ]),
+  members: load('members', []),
+  loans: load('loans', [])
+};
+
+// Fungsi untuk mengunggah pembaruan data ke GitHub
+let ghSyncing = false, ghTimer = null, ghAskedThisSession = false;
+async function saveToGitHub() {
+  if (ghSyncing) { clearTimeout(ghTimer); ghTimer = setTimeout(saveToGitHub, 3000); return; }
+  let token = localStorage.getItem('gh_token');
+  if (!token) {
+    if (ghAskedThisSession) return;          // jangan tanya berulang kali
+    ghAskedThisSession = true;
+    token = getGhToken();
+  }
+  if (!token) return;
+
+  const url = `https://api.github.com/repos/${GH_CONFIG.owner}/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`;
+  const headers = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' };
+  ghSyncing = true;
+  try {
+    let sha;
+    const getRes = await fetch(url, { headers });
+    if (getRes.ok) sha = (await getRes.json()).sha;
+    else if (getRes.status !== 404) throw new Error('GET ' + getRes.status);
+
+    const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(S, null, 2))));
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Update otomatis data perpustakaan dari web', content: contentEncoded, sha })
+    });
+    if (!putRes.ok) throw new Error('PUT ' + putRes.status);
+  } catch (err) {
+    console.error('Gagal menyinkronkan data ke GitHub:', err);
+    if (/ 401| 403/.test(err.message)) {       // token salah/kedaluwarsa
+      localStorage.removeItem('gh_token');
+      ghAskedThisSession = false;
+      alert('Token GitHub ditolak. Data tetap aman di perangkat ini. Muat ulang halaman untuk memasukkan token baru.');
+    }
+  } finally {
+    ghSyncing = false;
+  }
+}
+
+const saveDebounced = () => { clearTimeout(ghTimer); ghTimer = setTimeout(saveToGitHub, 2000); };
+
+const save = () => { 
+  try { 
+    for (const k in S) {
+      localStorage.setItem(k, JSON.stringify(S[k])); 
+    }
+    saveDebounced(); // Kirim ke GitHub (ditunda 2 detik)
+  } catch (e) {} 
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = s => String(s ?? '').trim().toLowerCase();
+const closeModal = id => { $(id).classList.add('hidden'); $(id).classList.remove('flex'); };
+const showModal = id => { $(id).classList.remove('hidden'); $(id).classList.add('flex'); };
+
+// ---------- Tab ----------
+function switchTab(t) {
+  ['books', 'members', 'loans'].forEach(x => $('tab-' + x).classList.toggle('hidden', x !== t));
+  document.querySelectorAll('.tabbtn').forEach(b => b.classList.toggle('bg-indigo-700', b.dataset.tab === t));
+  if (t === 'books') renderBooks(); if (t === 'members') renderMembers();
+  if (t === 'loans') { renderLoans(); fillPick(); $(curMember ? 'scan-book' : 'scan-member').focus(); }
+}
+document.querySelectorAll('.tabbtn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+
+// ---------- Buku ----------
+function renderBooks() {
+  $('book-body').innerHTML = S.books.length ? S.books.map(b => `<tr class="hover:bg-gray-50">
+    <td class="p-4 font-mono">${esc(b.code)}</td><td class="p-4 font-semibold text-gray-800">${esc(b.title)}</td><td class="p-4">${esc(b.author)}</td>
+    <td class="p-4 text-center">${b.stock}</td><td class="p-4 text-center font-bold text-indigo-600">${b.available}</td>
+    <td class="p-4 text-center space-x-2"><button onclick="openBook('${b.id}')" class="text-blue-600">✏️</button><button onclick="delBook('${b.id}')" class="text-red-600">🗑️</button></td></tr>`).join('')
+    : '<tr><td colspan="6" class="p-6 text-center text-gray-400">Belum ada data buku.</td></tr>';
+}
+function openBook(id) {
+  const b = S.books.find(x => x.id === id);
+  $('book-title-h').textContent = b ? 'Edit Buku' : 'Tambah Buku Baru';
+  $('b-id').value = b ? b.id : ''; $('b-code').value = b ? b.code : ''; $('b-title').value = b ? b.title : '';
+  $('b-author').value = b ? b.author : ''; $('b-stock').value = b ? b.stock : '';
+  showModal('book-modal');
+}
+function saveBook(e) {
+  e.preventDefault();
+  const id = $('b-id').value, stock = parseInt($('b-stock').value);
+  const d = { code: $('b-code').value.trim(), title: $('b-title').value.trim(), author: $('b-author').value.trim(), stock };
+  if (S.books.some(b => b.id !== id && norm(b.code) === norm(d.code))) return alert('Kode buku sudah dipakai.');
+  if (id) { const b = S.books.find(x => x.id === id); const diff = stock - b.stock; Object.assign(b, d); b.available = Math.max(0, b.available + diff); }
+  else S.books.push({ id: 'B' + Date.now(), ...d, available: stock });
+  save(); closeModal('book-modal'); renderBooks();
+}
+function delBook(id) {
+  if (S.loans.some(l => l.bookId === id && l.status === 'Dipinjam')) return alert('Buku ini masih dipinjam.');
+  if (confirm('Yakin menghapus buku ini?')) { S.books = S.books.filter(b => b.id !== id); save(); renderBooks(); }
+}
+
+// ---------- Impor Excel: buku ----------
+$('bk-file').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.');
+  try {
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: false });
+    let added = 0, updated = 0, skipped = 0;
+    rows.forEach(r => {
+      const g = (...keys) => { for (const k in r) if (keys.some(x => norm(k).includes(x))) return String(r[k]).trim(); return ''; };
+      const code = g('kode'), title = g('judul'), author = g('penulis', 'pengarang'), stock = parseInt(g('stok', 'jumlah'));
+      if (!code || !title || !(stock > 0)) { skipped++; return; }
+      const b = S.books.find(x => norm(x.code) === norm(code));
+      if (b) {
+        const diff = stock - b.stock;
+        Object.assign(b, { title, author: author || b.author, stock });
+        b.available = Math.max(0, b.available + diff); updated++;
+      } else {
+        S.books.push({ id: 'B' + Date.now() + '_' + S.books.length, code, title, author, stock, available: stock }); added++;
+      }
+    });
+    save(); renderBooks();
+    alert(`Impor selesai: ${added} buku ditambahkan, ${updated} diperbarui, ${skipped} dilewati (kode/judul kosong atau stok bukan angka lebih dari 0).`);
+  } catch (err) { alert('Gagal membaca file Excel: ' + err.message); }
+};
+
+// ---------- Anggota ----------
+function renderMembers() {
+  const q = norm($('m-search').value);
+  const list = S.members.filter(m => !q || norm(m.name).includes(q) || norm(m.nisn).includes(q));
+  $('member-body').innerHTML = list.length ? list.map(m => `<tr class="hover:bg-gray-50">
+    <td class="p-4 font-mono">${esc(m.nisn)}</td><td class="p-4 font-semibold text-gray-800">${esc(m.name)}</td>
+    <td class="p-4"><span class="px-2 py-0.5 rounded-full text-xs ${m.role === 'Guru' ? 'bg-purple-100 text-purple-800' : 'bg-sky-100 text-sky-800'}">${esc(m.role)}</span></td>
+    <td class="p-4">${esc(m.kelas || '-')}</td>
+    <td class="p-4 text-center space-x-2"><button onclick="openMember('${esc(m.nisn)}')" class="text-blue-600">✏️</button><button onclick="delMember('${esc(m.nisn)}')" class="text-red-600">🗑️</button></td></tr>`).join('')
+    : '<tr><td colspan="5" class="p-6 text-center text-gray-400">Belum ada data anggota. Impor dari Excel atau tambah manual.</td></tr>';
+}
+$('m-search').oninput = renderMembers;
+function openMember(nisn) {
+  const m = S.members.find(x => x.nisn === nisn);
+  $('member-title-h').textContent = m ? 'Edit Anggota' : 'Tambah Anggota';
+  $('m-old').value = m ? m.nisn : ''; $('m-nisn').value = m ? m.nisn : ''; $('m-name').value = m ? m.name : '';
+  $('m-role').value = m ? m.role : 'Siswa'; $('m-class').value = m ? (m.kelas || '') : '';
+  showModal('member-modal');
+}
+function saveMember(e) {
+  e.preventDefault();
+  const old = $('m-old').value, nisn = $('m-nisn').value.trim();
+  if (S.members.some(m => m.nisn !== old && norm(m.nisn) === norm(nisn))) return alert('NISN/NIP sudah terdaftar.');
+  const d = { nisn, name: $('m-name').value.trim(), role: $('m-role').value, kelas: $('m-class').value.trim() };
+  const i = S.members.findIndex(m => m.nisn === old);
+  if (i >= 0) S.members[i] = d; else S.members.push(d);
+  save(); closeModal('member-modal'); renderMembers();
+}
+function delMember(nisn) {
+  if (S.loans.some(l => l.nisn === nisn && l.status === 'Dipinjam')) return alert('Anggota ini masih memiliki buku yang belum dikembalikan.');
+  if (confirm('Yakin menghapus anggota ini?')) { S.members = S.members.filter(m => m.nisn !== nisn); save(); renderMembers(); }
+}
+
+// ---------- Impor Excel ----------
+$('xl-file').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.');
+  try {
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: false });
+    let added = 0, updated = 0, skipped = 0;
+    rows.forEach(r => {
+      const g = (...keys) => { for (const k in r) if (keys.some(x => norm(k).includes(x))) return String(r[k]).trim(); return ''; };
+      const name = g('nama'), nip = g('nip'), nisn = g('nisn') || nip || g('nomor', 'id');
+      if (!name || !nisn) { skipped++; return; }
+      const peran = norm(g('peran', 'tipe', 'status', 'jabatan'));
+      const role = peran.includes('guru') || peran.includes('staf') || (!peran && nip && !g('nisn')) ? 'Guru' : 'Siswa';
+      const d = { nisn, name, role, kelas: g('kelas') };
+      const i = S.members.findIndex(m => norm(m.nisn) === norm(nisn));
+      if (i >= 0) { S.members[i] = d; updated++; } else { S.members.push(d); added++; }
+    });
+    save(); renderMembers();
+    alert(`Impor selesai: ${added} ditambahkan, ${updated} diperbarui, ${skipped} dilewati (nama/NISN kosong).`);
+  } catch (err) { alert('Gagal membaca file Excel: ' + err.message); }
+};
+
+// ---------- Peminjaman ----------
+let curMember = null;
+function msg(t, ok) {
+  const m = $('scan-msg'); m.textContent = t; m.className = 'text-sm rounded-lg px-4 py-2 ' + (ok ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800');
+}
+function showMember() {
+  $('member-card').classList.toggle('hidden', !curMember);
+  if (!curMember) return;
+  const n = S.loans.filter(l => l.nisn === curMember.nisn && l.status === 'Dipinjam').length;
+  $('member-info').innerHTML = `<div class="font-bold text-gray-800">${esc(curMember.name)}</div><div class="text-sm">${esc(curMember.role)} · ${esc(curMember.nisn)}${curMember.kelas ? ' · ' + esc(curMember.kelas) : ''} · sedang meminjam ${n} buku</div>`;
+}
+function clearMember() { curMember = null; showMember(); $('scan-member').value = ''; $('scan-msg').className = 'hidden'; $('scan-member').focus(); }
+function setMember(v) {
+  const m = S.members.find(x => norm(x.nisn) === norm(v));
+  if (!m) { msg('Anggota dengan NISN/NIP "' + v.trim() + '" tidak ditemukan.', false); return; }
+  curMember = m; $('scan-member').value = ''; showMember(); msg('Anggota terdeteksi. Silakan scan buku.', true); $('scan-book').focus();
+}
+function doLoan(book) {
+  if (!curMember) return msg('Scan kartu anggota terlebih dahulu.', false);
+  if (!book) return msg('Buku tidak ditemukan.', false);
+  if (book.available <= 0) return msg('Stok "' + book.title + '" habis.', false);
+  if (S.loans.some(l => l.nisn === curMember.nisn && l.bookId === book.id && l.status === 'Dipinjam')) return msg('Anggota ini sudah meminjam buku tersebut.', false);
+  book.available--;
+  S.loans.unshift({ id: 'L' + Date.now(), nisn: curMember.nisn, borrower: curMember.name + ' (' + curMember.role + ')', bookId: book.id, bookTitle: book.title,
+    date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), status: 'Dipinjam' });
+  save(); renderLoans(); fillPick(); showMember(); msg('Berhasil: "' + book.title + '" dipinjam oleh ' + curMember.name + '.', true);
+}
+$('scan-member').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); setMember(e.target.value); } };
+$('scan-book').onkeydown = e => {
+  if (e.key !== 'Enter') return; e.preventDefault();
+  doLoan(S.books.find(b => norm(b.code) === norm(e.target.value))); e.target.value = ''; e.target.focus();
+};
+function fillPick() {
+  const av = S.books.filter(b => b.available > 0);
+  $('pick-book').innerHTML = av.length ? av.map(b => `<option value="${b.id}">${esc(b.title)} (${b.available})</option>`).join('') : '<option value="">Tidak ada stok</option>';
+}
+function loanFromSelect() { doLoan(S.books.find(b => b.id === $('pick-book').value)); }
+function renderLoans() {
+  $('loan-body').innerHTML = S.loans.length ? S.loans.map(l => `<tr class="hover:bg-gray-50">
+    <td class="p-4 font-semibold text-gray-800">${esc(l.borrower)}</td><td class="p-4">${esc(l.bookTitle)}</td><td class="p-4 text-center">${esc(l.date)}</td>
+    <td class="p-4 text-center"><span class="px-2 py-0.5 rounded-full text-xs ${l.status === 'Dipinjam' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${l.status}</span></td>
+    <td class="p-4 text-center">${l.status === 'Dipinjam' ? `<button onclick="returnBook('${l.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg text-xs">Kembalikan</button>` : '-'}</td></tr>`).join('')
+    : '<tr><td colspan="5" class="p-6 text-center text-gray-400">Belum ada riwayat peminjaman.</td></tr>';
+}
+function returnBook(id) {
+  const l = S.loans.find(x => x.id === id); if (!l || !confirm('Konfirmasi pengembalian buku ini?')) return;
+  l.status = 'Dikembalikan';
+  const b = S.books.find(x => x.id === l.bookId); if (b) b.available++;
+  save(); renderLoans(); fillPick(); showMember();
+}
+
+// ---------- Scan Kamera dengan ZXing BrowserMultiFormatReader ----------
+let codeReader = null;
+async function startCam(target) {
+  if (typeof ZXing === 'undefined') return alert('Pustaka pemindai kamera gagal dimuat. Periksa koneksi internet Anda.');
+  
+  $('cam-title').textContent = target === 'member' ? 'Scan Barcode Kartu Anggota' : 'Scan Barcode Buku';
+  showModal('cam-modal');
+
+  if (!codeReader) {
+    codeReader = new ZXing.BrowserMultiFormatReader();
+  }
+
+  try {
+    const videoInputDevices = await codeReader.listVideoInputDevices();
+    let selectedDeviceId = videoInputDevices[0]?.deviceId;
+    
+    // Pilih kamera belakang jika ada di smartphone
+    const backCamera = videoInputDevices.find(device => /back|rear|environment/i.test(device.label));
+    if (backCamera) {
+      selectedDeviceId = backCamera.deviceId;
+    }
+
+    codeReader.decodeFromVideoDevice(selectedDeviceId, 'cam-video', (result, err) => {
+      if (result) {
+        const val = result.getText();
+        stopCam();
+        if (target === 'member') {
+          setMember(val);
+        } else {
+          doLoan(S.books.find(b => norm(b.code) === norm(val)));
+        }
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    alert('Tidak dapat mengakses kamera smartphone. Pastikan izin kamera telah diberikan di browser Anda.');
+    stopCam();
+  }
+}
+
+function stopCam() {
+  if (codeReader) {
+    codeReader.reset();
+  }
+  closeModal('cam-modal');
+}
+
+switchTab('books');
+</script>
+</body>
+</html>

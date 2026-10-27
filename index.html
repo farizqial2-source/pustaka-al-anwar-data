@@ -212,7 +212,7 @@ const GH_CONFIG = {
 function getGhToken(forcePrompt = false) {
   let t = forcePrompt ? null : localStorage.getItem('gh_token');
   if (!t) {
-    t = prompt('Masukkan token GitHub (hanya disimpan di perangkat ini):');
+    t = prompt('Masukkan Kode Akses (hanya disimpan di perangkat ini):');
     if (t) localStorage.setItem('gh_token', t.trim());
   }
   return t ? t.trim() : null;

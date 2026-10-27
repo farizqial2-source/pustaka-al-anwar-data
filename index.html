@@ -93,9 +93,19 @@
     </div>
     <div id="scan-msg" class="hidden text-sm rounded-lg px-4 py-2"></div>
   </div>
+  <div class="bg-white p-4 rounded-xl shadow-sm border space-y-2">
+    <div class="flex flex-wrap items-center gap-2">
+      <button data-lf="all" class="lfbtn px-3 py-2 rounded-lg text-sm font-medium"></button>
+      <button data-lf="out" class="lfbtn px-3 py-2 rounded-lg text-sm font-medium"></button>
+      <button data-lf="late" class="lfbtn px-3 py-2 rounded-lg text-sm font-medium"></button>
+      <button data-lf="done" class="lfbtn px-3 py-2 rounded-lg text-sm font-medium"></button>
+      <input id="l-search" autocomplete="off" placeholder="Cari peminjam / NISN / judul buku…" class="flex-1 min-w-[200px] border rounded-lg px-3 py-2 text-sm">
+    </div>
+    <p id="loan-summary" class="text-xs text-gray-500"></p>
+  </div>
   <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
     <table class="w-full text-left text-sm"><thead class="bg-gray-50 text-gray-600 uppercase text-xs"><tr>
-      <th class="p-4">Peminjam</th><th class="p-4">Judul Buku</th><th class="p-4 text-center">Tanggal</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Aksi</th>
+      <th class="p-4">Peminjam</th><th class="p-4">Judul Buku</th><th class="p-4 text-center">Tgl Pinjam</th><th class="p-4 text-center">Batas Kembali</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Denda</th><th class="p-4 text-center">Aksi</th>
     </tr></thead><tbody id="loan-body" class="divide-y"></tbody></table>
   </div>
 </section>
@@ -106,7 +116,7 @@
       <div><h2 class="text-xl font-bold text-gray-800">Rekap Perpustakaan</h2><p class="text-xs text-gray-500 mt-1">Ringkasan dan daftar lengkap buku, anggota, serta peminjaman &amp; pengembalian. Dapat diekspor ke Excel atau CSV.</p></div>
       <button onclick="exportAll()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium">⬇ Ekspor Semua (Excel)</button>
     </div>
-    <div id="recap-stats" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+    <div id="recap-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
   </div>
 
   <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
@@ -120,7 +130,7 @@
       <div id="r-role-wrap" class="hidden"><label class="block text-xs font-medium mb-1">Peran</label><select id="r-role" class="border rounded-lg px-3 py-2 text-sm"><option value="">Semua</option><option>Siswa</option><option>Guru</option></select></div>
       <div id="r-loan-wrap" class="hidden">
         <div class="flex flex-wrap items-end gap-3">
-          <div><label class="block text-xs font-medium mb-1">Status</label><select id="r-status" class="border rounded-lg px-3 py-2 text-sm"><option value="">Semua</option><option value="Dipinjam">Dipinjam</option><option value="Dikembalikan">Dikembalikan</option></select></div>
+          <div><label class="block text-xs font-medium mb-1">Status</label><select id="r-status" class="border rounded-lg px-3 py-2 text-sm"><option value="">Semua</option><option value="Dipinjam">Belum dikembalikan</option><option value="Terlambat">Terlambat</option><option value="Dikembalikan">Dikembalikan</option></select></div>
           <div><label class="block text-xs font-medium mb-1">Dipinjam dari</label><input id="r-from" type="date" class="border rounded-lg px-3 py-2 text-sm"></div>
           <div><label class="block text-xs font-medium mb-1">Sampai</label><input id="r-to" type="date" class="border rounded-lg px-3 py-2 text-sm"></div>
         </div>
@@ -397,6 +407,23 @@ $('xl-file').onchange = async e => {
   } catch (err) { alert('Gagal membaca file Excel: ' + err.message); }
 };
 
+// ---------- Aturan peminjaman ----------
+const LOAN_DAYS = 14;        // batas waktu peminjaman (hari)
+const FINE_PER_DAY = 2000;   // denda per hari keterlambatan (Rp)
+const DAY_MS = 86400000;
+const rp = n => 'Rp' + Number(n || 0).toLocaleString('id-ID');
+const startOfDay = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+// Batas kembali = tanggal pinjam + 14 hari. Telat mulai hari ke-15. Denda dihitung per hari kalender.
+function loanInfo(l) {
+  const t = loanTs(l), due = t ? startOfDay(t) + LOAN_DAYS * DAY_MS : 0;
+  const active = l.status === 'Dipinjam';
+  let late = 0;
+  if (!active && typeof l.lateDays === 'number') late = l.lateDays;            // sudah dikembalikan: pakai nilai yang tersimpan
+  else if (due) { const end = active ? Date.now() : l.returnTs; if (end) late = Math.max(0, Math.round((startOfDay(end) - due) / DAY_MS)); }
+  const fine = !active && typeof l.fine === 'number' ? l.fine : late * FINE_PER_DAY;
+  return { due, late, fine, overdue: active && late > 0 };
+}
+
 // ---------- Peminjaman ----------
 let curMember = null;
 function msg(t, ok) {
@@ -406,7 +433,9 @@ function showMember() {
   $('member-card').classList.toggle('hidden', !curMember);
   if (!curMember) return;
   const n = S.loans.filter(l => l.nisn === curMember.nisn && l.status === 'Dipinjam').length;
-  $('member-info').innerHTML = `<div class="font-bold text-gray-800">${esc(curMember.name)}</div><div class="text-sm">${esc(curMember.role)} · ${esc(curMember.nisn)}${curMember.kelas ? ' · ' + esc(curMember.kelas) : ''} · sedang meminjam ${n} buku</div>`;
+  const od = S.loans.filter(l => l.nisn === curMember.nisn && loanInfo(l).overdue);
+  const warn = od.length ? `<div class="text-sm font-semibold text-red-600 mt-1">⚠ ${od.length} buku terlambat · denda berjalan ${rp(od.reduce((a, l) => a + loanInfo(l).fine, 0))}</div>` : '';
+  $('member-info').innerHTML = `<div class="font-bold text-gray-800">${esc(curMember.name)}</div><div class="text-sm">${esc(curMember.role)} · ${esc(curMember.nisn)}${curMember.kelas ? ' · ' + esc(curMember.kelas) : ''} · sedang meminjam ${n} buku</div>${warn}`;
 }
 function clearMember() { curMember = null; showMember(); $('scan-member').value = ''; $('scan-msg').className = 'hidden'; $('scan-member').focus(); }
 function setMember(v) {
@@ -422,7 +451,7 @@ function doLoan(book) {
   book.available--;
   S.loans.unshift({ id: 'L' + Date.now(), nisn: curMember.nisn, borrower: curMember.name + ' (' + curMember.role + ')', bookId: book.id, bookTitle: book.title,
     date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), ts: Date.now(), status: 'Dipinjam' });
-  save(); renderLoans(); fillPick(); showMember(); msg('Berhasil: "' + book.title + '" dipinjam oleh ' + curMember.name + '.', true);
+  save(); renderLoans(); fillPick(); showMember(); msg('Berhasil: "' + book.title + '" dipinjam oleh ' + curMember.name + '. Batas pengembalian ' + fmtDate(startOfDay(Date.now()) + LOAN_DAYS * DAY_MS) + '.', true);
 }
 $('scan-member').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); setMember(e.target.value); } };
 $('scan-book').onkeydown = e => {
@@ -434,31 +463,62 @@ function fillPick() {
   $('pick-book').innerHTML = av.length ? av.map(b => `<option value="${b.id}">${esc(b.title)} (${b.available})</option>`).join('') : '<option value="">Tidak ada stok</option>';
 }
 function loanFromSelect() { doLoan(S.books.find(b => b.id === $('pick-book').value)); }
+let loanFilter = 'all';
 function renderLoans() {
-  $('loan-body').innerHTML = S.loans.length ? S.loans.map(l => `<tr class="hover:bg-gray-50">
+  const q = norm($('l-search').value);
+  const all = S.loans.map(l => ({ l, i: loanInfo(l) }));
+  const cnt = { all: all.length, out: 0, late: 0, done: 0 };
+  let running = 0, borrowers = new Set();
+  all.forEach(({ l, i }) => {
+    if (l.status === 'Dipinjam') { cnt.out++; if (i.overdue) { cnt.late++; running += i.fine; borrowers.add(l.nisn); } } else cnt.done++;
+  });
+  const names = { all: 'Semua', out: 'Belum Dikembalikan', late: 'Terlambat', done: 'Sudah Dikembalikan' };
+  document.querySelectorAll('.lfbtn').forEach(b => {
+    const k = b.dataset.lf, on = k === loanFilter;
+    b.textContent = names[k] + ' (' + cnt[k] + ')';
+    b.classList.toggle('bg-indigo-600', on && k !== 'late'); b.classList.toggle('bg-red-600', on && k === 'late');
+    b.classList.toggle('text-white', on); b.classList.toggle('bg-gray-100', !on); b.classList.toggle('text-gray-700', !on);
+  });
+  $('loan-summary').textContent = `Batas peminjaman ${LOAN_DAYS} hari · denda ${rp(FINE_PER_DAY)} per hari keterlambatan.`
+    + (cnt.late ? ` Saat ini ${borrowers.size} anggota terlambat, denda berjalan ${rp(running)}.` : '');
+  const rows = all.filter(({ l, i }) =>
+    (loanFilter === 'all' || (loanFilter === 'out' && l.status === 'Dipinjam') || (loanFilter === 'late' && i.overdue) || (loanFilter === 'done' && l.status !== 'Dipinjam'))
+    && (!q || norm(l.borrower).includes(q) || norm(l.nisn).includes(q) || norm(l.bookTitle).includes(q)));
+  $('loan-body').innerHTML = rows.length ? rows.map(({ l, i }) => {
+    const badge = l.status === 'Dipinjam'
+      ? (i.overdue ? `<span class="px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-800">Terlambat ${i.late} hari</span>` : '<span class="px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800">Dipinjam</span>')
+      : `<span class="px-2 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-800">Dikembalikan</span>` + (l.returnDate ? `<div class="text-xs text-gray-400 mt-1">${esc(l.returnDate)}</div>` : '');
+    const fine = i.fine > 0 ? `<span class="font-semibold ${i.overdue ? 'text-red-600' : 'text-gray-700'}">${rp(i.fine)}</span><div class="text-xs text-gray-400">${i.late} hari${i.overdue ? ' (berjalan)' : ''}</div>` : '-';
+    return `<tr class="${i.overdue ? 'bg-red-50' : 'hover:bg-gray-50'}">
     <td class="p-4 font-semibold text-gray-800">${esc(l.borrower)}</td><td class="p-4">${esc(l.bookTitle)}</td><td class="p-4 text-center">${esc(l.date)}</td>
-    <td class="p-4 text-center"><span class="px-2 py-0.5 rounded-full text-xs ${l.status === 'Dipinjam' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${l.status}</span></td>
-    <td class="p-4 text-center">${l.status === 'Dipinjam' ? `<button onclick="returnBook('${l.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg text-xs">Kembalikan</button>` : '-'}</td></tr>`).join('')
-    : '<tr><td colspan="5" class="p-6 text-center text-gray-400">Belum ada riwayat peminjaman.</td></tr>';
+    <td class="p-4 text-center">${i.due ? esc(fmtDate(i.due)) : '-'}</td><td class="p-4 text-center">${badge}</td><td class="p-4 text-center">${fine}</td>
+    <td class="p-4 text-center">${l.status === 'Dipinjam' ? `<button onclick="returnBook('${l.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg text-xs">Kembalikan</button>` : '-'}</td></tr>`;
+  }).join('') : '<tr><td colspan="7" class="p-6 text-center text-gray-400">' + (S.loans.length ? 'Tidak ada data yang cocok.' : 'Belum ada riwayat peminjaman.') + '</td></tr>';
 }
+document.querySelectorAll('.lfbtn').forEach(b => b.onclick = () => { loanFilter = b.dataset.lf; renderLoans(); });
+$('l-search').addEventListener('input', renderLoans);
 function returnBook(id) {
-  const l = S.loans.find(x => x.id === id); if (!l || !confirm('Konfirmasi pengembalian buku ini?')) return;
+  const l = S.loans.find(x => x.id === id); if (!l) return;
+  const i = loanInfo(l);   // dihitung sebelum status berubah
+  if (!confirm('Konfirmasi pengembalian buku ini?' + (i.late > 0 ? `\n\nTerlambat ${i.late} hari. Denda: ${rp(i.fine)}` : ''))) return;
   l.status = 'Dikembalikan'; l.returnTs = Date.now();
   l.returnDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  l.lateDays = i.late; l.fine = i.fine;
   const b = S.books.find(x => x.id === l.bookId); if (b) b.available++;
   save(); renderLoans(); fillPick(); showMember();
+  if (i.fine > 0) msg(`Buku dikembalikan. Terlambat ${i.late} hari, denda yang harus dibayar ${rp(i.fine)}.`, false);
 }
 
 // ---------- Rekap ----------
 let recapTab = 'books';
 const RECAP_COLS = {
   books: ['Kode', 'Judul', 'Penulis', 'Stok', 'Tersedia', 'Sedang Dipinjam', 'Total Dipinjam'],
-  members: ['NISN / NIP', 'Nama', 'Peran', 'Kelas', 'Sedang Meminjam', 'Total Peminjaman'],
-  loans: ['No', 'NISN / NIP', 'Nama Peminjam', 'Peran', 'Kelas', 'Kode Buku', 'Judul Buku', 'Tanggal Pinjam', 'Tanggal Kembali', 'Status']
+  members: ['NISN / NIP', 'Nama', 'Peran', 'Kelas', 'Sedang Meminjam', 'Buku Terlambat', 'Total Denda (Rp)', 'Total Peminjaman'],
+  loans: ['No', 'NISN / NIP', 'Nama Peminjam', 'Peran', 'Kelas', 'Kode Buku', 'Judul Buku', 'Tanggal Pinjam', 'Batas Kembali', 'Tanggal Kembali', 'Terlambat (hari)', 'Denda (Rp)', 'Status']
 };
 const RECAP_NAMES = { books: 'Daftar Buku', members: 'Daftar Anggota', loans: 'Peminjaman & Pengembalian' };
 const RECAP_FILE = { books: 'Buku', members: 'Anggota', loans: 'Peminjaman' };
-const RECAP_CENTER = new Set(['No', 'Stok', 'Tersedia', 'Sedang Dipinjam', 'Total Dipinjam', 'Sedang Meminjam', 'Total Peminjaman', 'Tanggal Pinjam', 'Tanggal Kembali', 'Status']);
+const RECAP_CENTER = new Set(['No', 'Stok', 'Tersedia', 'Sedang Dipinjam', 'Total Dipinjam', 'Sedang Meminjam', 'Total Peminjaman', 'Buku Terlambat', 'Total Denda (Rp)', 'Terlambat (hari)', 'Denda (Rp)', 'Tanggal Pinjam', 'Batas Kembali', 'Tanggal Kembali', 'Status']);
 const MONTHS_ID = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
 const fmtDate = ts => new Date(ts).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 // Data lama hanya menyimpan tanggal teks ("27 Oktober 2026"); data baru juga menyimpan ts.
@@ -472,13 +532,17 @@ function loanTs(l) {
 function recapStats() {
   const act = S.loans.filter(l => l.status === 'Dipinjam').length;
   const siswa = S.members.filter(m => m.role !== 'Guru').length;
+  const od = S.loans.map(loanInfo).filter(i => i.overdue);
+  const recorded = S.loans.reduce((a, l) => a + (l.status !== 'Dipinjam' ? loanInfo(l).fine : 0), 0);
   return [
     { label: 'Judul Buku', value: S.books.length, sub: '' },
     { label: 'Total Eksemplar', value: S.books.reduce((a, b) => a + (+b.stock || 0), 0), sub: S.books.reduce((a, b) => a + (+b.available || 0), 0) + ' tersedia' },
     { label: 'Anggota', value: S.members.length, sub: siswa + ' siswa · ' + (S.members.length - siswa) + ' guru' },
     { label: 'Sedang Dipinjam', value: act, sub: '' },
+    { label: 'Sedang Terlambat', value: od.length, sub: 'denda berjalan ' + rp(od.reduce((a, i) => a + i.fine, 0)) },
     { label: 'Sudah Dikembalikan', value: S.loans.length - act, sub: '' },
-    { label: 'Total Transaksi', value: S.loans.length, sub: '' }
+    { label: 'Total Transaksi', value: S.loans.length, sub: '' },
+    { label: 'Denda Tercatat', value: recorded, fmt: rp(recorded), sub: 'dari pengembalian terlambat' }
   ];
 }
 
@@ -496,13 +560,18 @@ function recapData(kind, all = false) {
     }));
   } else if (kind === 'members') {
     const role = all ? '' : $('r-role').value;
-    const act = {}, tot = {};
-    S.loans.forEach(l => { tot[l.nisn] = (tot[l.nisn] || 0) + 1; if (l.status === 'Dipinjam') act[l.nisn] = (act[l.nisn] || 0) + 1; });
+    const act = {}, tot = {}, lt = {}, fn = {};
+    S.loans.forEach(l => {
+      const i = loanInfo(l);
+      tot[l.nisn] = (tot[l.nisn] || 0) + 1; fn[l.nisn] = (fn[l.nisn] || 0) + i.fine;
+      if (l.status === 'Dipinjam') act[l.nisn] = (act[l.nisn] || 0) + 1;
+      if (i.overdue) lt[l.nisn] = (lt[l.nisn] || 0) + 1;
+    });
     rows = S.members.filter(m => (!role || m.role === role) && has(m.nisn, m.name, m.kelas))
       .slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'id'))
       .map(m => ({
         'NISN / NIP': m.nisn, 'Nama': m.name, 'Peran': m.role, 'Kelas': m.kelas || '-',
-        'Sedang Meminjam': act[m.nisn] || 0, 'Total Peminjaman': tot[m.nisn] || 0
+        'Sedang Meminjam': act[m.nisn] || 0, 'Buku Terlambat': lt[m.nisn] || 0, 'Total Denda (Rp)': fn[m.nisn] || 0, 'Total Peminjaman': tot[m.nisn] || 0
       }));
   } else {
     const st = all ? '' : $('r-status').value;
@@ -511,18 +580,19 @@ function recapData(kind, all = false) {
     const mm = {}, bm = {};
     S.members.forEach(m => mm[m.nisn] = m); S.books.forEach(b => bm[b.id] = b);
     rows = S.loans.filter(l => {
-      const t = loanTs(l);
-      if (st && l.status !== st) return false;
+      const t = loanTs(l), i = loanInfo(l);
+      if (st === 'Terlambat' ? !i.overdue : (st && l.status !== st)) return false;
       if (from && t < from) return false;
       if (to && t > to) return false;
       return has(l.nisn, l.borrower, l.bookTitle, bm[l.bookId] && bm[l.bookId].code);
     }).map((l, i) => {
-      const m = mm[l.nisn], b = bm[l.bookId], br = String(l.borrower || '');
+      const m = mm[l.nisn], b = bm[l.bookId], br = String(l.borrower || ''), inf = loanInfo(l);
       const rm = br.match(/\((Siswa|Guru)\)\s*$/);
       return {
         'No': i + 1, 'NISN / NIP': l.nisn, 'Nama Peminjam': m ? m.name : br.replace(/\s*\((Siswa|Guru)\)\s*$/, ''),
         'Peran': m ? m.role : (rm ? rm[1] : '-'), 'Kelas': (m && m.kelas) || '-', 'Kode Buku': b ? b.code : '-',
-        'Judul Buku': l.bookTitle, 'Tanggal Pinjam': l.date || '-', 'Tanggal Kembali': l.returnDate || '-', 'Status': l.status
+        'Judul Buku': l.bookTitle, 'Tanggal Pinjam': l.date || '-', 'Batas Kembali': inf.due ? fmtDate(inf.due) : '-', 'Tanggal Kembali': l.returnDate || '-',
+        'Terlambat (hari)': inf.late, 'Denda (Rp)': inf.fine, 'Status': inf.overdue ? 'Terlambat' : l.status
       };
     });
   }
@@ -538,7 +608,7 @@ function renderRecap() {
   $('r-role-wrap').classList.toggle('hidden', recapTab !== 'members');
   $('r-loan-wrap').classList.toggle('hidden', recapTab !== 'loans');
   $('recap-stats').innerHTML = recapStats().map(c => `<div class="border rounded-xl p-3">
-    <div class="text-xs text-gray-500">${esc(c.label)}</div><div class="text-2xl font-bold text-indigo-600">${c.value}</div>
+    <div class="text-xs text-gray-500">${esc(c.label)}</div><div class="text-2xl font-bold ${c.label === 'Sedang Terlambat' && c.value ? 'text-red-600' : 'text-indigo-600'}">${c.fmt ?? c.value}</div>
     <div class="text-xs text-gray-400 min-h-[1rem]">${esc(c.sub)}</div></div>`).join('');
 
   const { cols, rows } = recapData(recapTab);
@@ -547,8 +617,9 @@ function renderRecap() {
   $('recap-head').innerHTML = '<tr>' + cols.map(c => `<th class="p-4 ${RECAP_CENTER.has(c) ? 'text-center' : ''}">${esc(c)}</th>`).join('') + '</tr>';
   $('recap-body').innerHTML = rows.length ? rows.map(r => '<tr class="hover:bg-gray-50">' + cols.map((c, i) => {
     const v = r[c], cls = 'p-4 ' + (RECAP_CENTER.has(c) ? 'text-center ' : '');
-    if (c === 'Status') return `<td class="${cls}"><span class="px-2 py-0.5 rounded-full text-xs ${v === 'Dipinjam' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${esc(v)}</span></td>`;
-    return `<td class="${cls}${i === 0 && c !== 'No' ? 'font-mono' : ''}">${esc(v)}</td>`;
+    if (c === 'Status') return `<td class="${cls}"><span class="px-2 py-0.5 rounded-full text-xs ${v === 'Dipinjam' ? 'bg-amber-100 text-amber-800' : v === 'Terlambat' ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${esc(v)}</span></td>`;
+    const shown = c.endsWith('(Rp)') ? Number(v).toLocaleString('id-ID') : v;
+    return `<td class="${cls}${i === 0 && c !== 'No' ? 'font-mono' : ''}">${esc(shown)}</td>`;
   }).join('') + '</tr>').join('')
     : `<tr><td colspan="${cols.length}" class="p-6 text-center text-gray-400">Tidak ada data yang cocok.</td></tr>`;
 }

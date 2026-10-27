@@ -17,12 +17,14 @@
   --brand:#059669;
   --brand-d:#047857;
   --ink:#111827;
+  --white:#ffffff;
 } 
 body{
-  background:#f3f4f6!important;
+  background: linear-gradient(180deg, #d5ece7 0%, #b0eacf 100%) !important;
+  background-attachment: fixed !important;
   font-family:'Poppins','Inter',system-ui,sans-serif!important;
   color:#374151;
-} 
+}
 @media print{
   .side,.topbar,.no-print{display:none!important}
   body{background:#fff}.app{display:block}
@@ -43,20 +45,23 @@ thead{background:#f9fafb!important}
 .content{flex:1;min-width:0} 
 
 .side{
-  width:88px;
-  background:#ffffff;
-  color:#4b5563;
-  border-right:1px solid #e5e7eb;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-  padding:24px 0;
-  position:sticky;
-  top:0;
-  align-self:flex-start;
-  height:100vh;
-} 
+  width: 88px;
+  background: #ffffff;
+  color: #4b5563;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0;
+  position: sticky;
+  top: 16px;
+  align-self: flex-start;
+  height: calc(100vh - 32px);
+  border-radius: 28px;
+  margin: 16px 0 16px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
 .side .tabbtn{
   width:64px;
   display:flex;
@@ -119,10 +124,10 @@ thead{background:#f9fafb!important}
   <button data-tab="recap" class="tabbtn"><span class="ic"><img src="listmajor-svgrepo-com.svg" class="w-7 h-7"></span><span>Rekap</span></button> 
 </aside> 
 <div class="content"> 
-<header class="topbar flex items-center justify-between gap-3 px-4 md:px-8 py-4 bg-white border-b border-gray-200">   
+<header class="topbar flex items-center justify-between gap-3 px-4 md:px-8 pt-4 pb-2">  
   <div class="flex items-center gap-3">
     <img src="Logo Yayasan.png" alt="Logo Yayasan Al-Anwar" class="w-10 h-10 object-contain">
-    <span class="text-lg md:text-xl font-bold" style="color:var(--ink)">Perpustakaan Al Anwar</span>
+    <span class="text-lg md:text-xl font-bold" style="color:var(--brand-d)">Perpustakaan Al Anwar</span>
   </div>   
   <button id="sync-chip" class="no-print text-xs px-3.5 py-2 rounded-full font-medium bg-gray-100 text-gray-600 transition hover:bg-gray-200">  Menyambungkan </button> 
 </header> 

@@ -24,7 +24,8 @@ body{
   background-attachment: fixed !important;
   font-family:'Poppins','Inter',system-ui,sans-serif!important;
   color:#374151;
-}
+  min-height: 100vh;
+} 
 main {
   padding-top: 6px !important;
 }
@@ -33,7 +34,7 @@ main > section {
 }
 @media print{
   .side,.topbar,.no-print{display:none!important}
-  body{background:#fff}.app{display:block}
+  body{background:#fff!important}.app{display:block}
 } 
 
 .bg-indigo-600{background:var(--brand)!important}
@@ -50,39 +51,41 @@ thead{background:#f9fafb!important}
 .app{display:flex;min-height:100vh}
 .content{flex:1;min-width:0} 
 
+/* Model Sidebar Mengambang */
 .side{
-  width: 72px; /* Dikecilkan dari 88px */
+  width: 72px;
   background: #ffffff;
   color: #4b5563;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px; /* Mengurangi jarak antar menu */
-  padding: 16px 0; /* Mengurangi padding atas-bawah */
+  gap: 10px;
+  padding: 16px 0;
   position: sticky;
   top: 16px;
   align-self: flex-start;
   height: calc(100vh - 32px);
   border-radius: 24px;
   margin: 16px 0 16px 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
-}
+} 
 .side .tabbtn{
-  width: 54px; /* Dikecilkan agar pas */
+  width: 54px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   padding: 8px 0;
   border-radius: 14px;
-  font-size: 10px; /* Ukuran teks sedikit lebih kecil */
+  font-size: 10px;
   color: #6b7280;
   background: transparent;
   transition: all 0.2s;
+  cursor: pointer;
 }
 .side .tabbtn img, .side .tabbtn svg {
-  width: 24px; /* Ukuran ikon diperkecil */
+  width: 24px;
   height: 24px;
 }
 .side .tabbtn .ic{font-size:21px}
@@ -94,49 +97,13 @@ thead{background:#f9fafb!important}
 .side .tabbtn.bg-indigo-700 svg {
   filter: brightness(0) invert(1);
 }
+
 /* Mengubah warna ikon menjadi hijau saat kursor diarahkan (hover) */
 .side .tabbtn:hover img,
 .side .tabbtn:hover svg {
   filter: brightness(0) saturate(100%) invert(43%) sepia(85%) saturate(464%) hue-rotate(125deg) brightness(95%) contrast(93%);
 }
-@media(max-width:767px){
-  .app{display:block;padding-bottom:88px}
-  .side{position:fixed;left:0;right:0;bottom:0;top:auto;width:auto;height:auto;flex-direction:row;justify-content:space-around;gap:0;border-radius:20px 20px 0 0;border-right:none;border-top:1px solid #e5e7eb;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));z-index:40;background:#ffffff} 
-  .side .tabbtn{width:auto;flex:1}
-} 
 
-.home-banner{background:linear-gradient(135deg,#059669,#10b981)}
-.home-head{background:var(--brand);color:#fff;font-size:12px;font-weight:600;letter-spacing:.05em;padding:12px 16px;display:flex;justify-content:space-between} 
-
-.donut{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;position:relative;flex:none}
-.donut::after{content:'';position:absolute;inset:14px;background:#fff;border-radius:50%}
-.donut span{position:relative;z-index:1;font-weight:700;font-size:22px;color:var(--ink)} 
-
-.pbar{height:6px;border-radius:6px;background:#e5e7eb}
-.pbar i{display:block;height:100%;border-radius:6px} 
-
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px}
-.cal b{font-size:11px;color:#9ca3af}
-.cal div{position:relative;padding:8px 0;border-radius:10px} 
-.cal .today{background:var(--brand);color:#fff;font-weight:700}
-.dot{position:absolute;bottom:2px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#10b981}
-.dot.late{background:#ef4444}
-/* Perbaikan untuk form scan agar tombol Scan pas di samping input */
-#tab-loans .flex.gap-2 {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-#tab-loans input[id^="scan-"] {
-  flex: 1;
-  min-width: 0;
-}
-#tab-loans button[onclick*="startCam"] {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-/* Perbaikan Bottom Bar agar mengambang rapi dan tidak terpotong */
 @media(max-width:767px){
   .app{display:block;padding-bottom:95px!important}
   .side{
@@ -156,14 +123,33 @@ thead{background:#f9fafb!important}
     z-index:50!important;
     background:#ffffff!important;
     box-shadow:0 10px 25px rgba(0,0,0,0.1)!important;
+    margin: 0 !important;
   } 
   .side .tabbtn{
     width:auto!important;
     flex:1!important;
     padding:6px 0!important;
   }
-}
-/* Memperbaiki tata letak form peminjaman agar tombol tetap berada di dalam kontainer */
+} 
+
+.home-banner{background:linear-gradient(135deg,#059669,#10b981)}
+.home-head{background:var(--brand);color:#fff;font-size:12px;font-weight:600;letter-spacing:.05em;padding:12px 16px;display:flex;justify-content:space-between} 
+
+.donut{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;position:relative;flex:none}
+.donut::after{content:'';position:absolute;inset:14px;background:#fff;border-radius:50%}
+.donut span{position:relative;z-index:1;font-weight:700;font-size:22px;color:var(--ink)} 
+
+.pbar{height:6px;border-radius:6px;background:#e5e7eb}
+.pbar i{display:block;height:100%;border-radius:6px} 
+
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px}
+.cal b{font-size:11px;color:#9ca3af}
+.cal div{position:relative;padding:8px 0;border-radius:10px} 
+.cal .today{background:var(--brand);color:#fff;font-weight:700}
+.dot{position:absolute;bottom:2px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#10b981}
+.dot.late{background:#ef4444}
+
+/* Perbaikan untuk form scan agar tombol pas dan tidak keluar kontainer */
 #tab-loans .grid.md\:grid-cols-2 > div {
   overflow: hidden;
 }
@@ -191,21 +177,31 @@ thead{background:#f9fafb!important}
 <body class="font-sans text-gray-700"> 
 <div class="app"> 
 <aside class="side no-print">   
-  <button data-tab="home" class="tabbtn"><span class="ic"><img src="homemajor-svgrepo-com.svg" class="w-7 h-7"></span><span>Beranda</span></button>   
-  <button data-tab="books" class="tabbtn"><span class="ic"><img src="vocabularymajor-svgrepo-com.svg" class="w-7 h-7"></span><span>Buku</span></button>   
-  <button data-tab="members" class="tabbtn"><span class="ic"><img src="identitycardmajor-svgrepo-com.svg" class="w-7 h-7"></span><span>Anggota</span></button>   
-  <button data-tab="loans" class="tabbtn"><span class="ic"><img src="replacemajor-svgrepo-com.svg" class="w-7 h-7"></span><span>Pinjam</span></button>   
-  <button data-tab="recap" class="tabbtn"><span class="ic"><img src="listmajor-svgrepo-com.svg" class="w-7 h-7"></span><span>Rekap</span></button> 
+  <button data-tab="home" class="tabbtn"><span class="ic"><img src="homemajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Beranda</span></button>   
+  <button data-tab="books" class="tabbtn"><span class="ic"><img src="vocabularymajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Buku</span></button>   
+  <button data-tab="members" class="tabbtn"><span class="ic"><img src="identitycardmajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Anggota</span></button>   
+  <button data-tab="loans" class="tabbtn"><span class="ic"><img src="replacemajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Pinjam</span></button>   
+  <button data-tab="recap" class="tabbtn"><span class="ic"><img src="listmajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Rekap</span></button> 
+
+  <!-- Bagian Bawah Sidebar (Tombol Buka Setelan) -->
+  <div style="margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-bottom: 8px; width: 100%; align-items: center;">
+    <button onclick="openSettingsModal()" class="tabbtn" title="Pengaturan Sistem">
+      <span class="ic" style="font-size: 18px;"><img src="settingsminor-svgrepo-com.svg" class="w-8 h-8"></span>
+      <span>Setelan</span>
+    </button>
+  </div>
 </aside> 
+
 <div class="content"> 
-<header class="topbar flex items-center justify-between gap-3 px-4 md:px-8 pt-4 pb-2">  
+<header class="topbar flex items-center justify-between gap-3 px-4 md:px-8 pt-4 pb-2">   
   <div class="flex items-center gap-3">
     <img src="Logo Yayasan.png" alt="Logo Yayasan Al-Anwar" class="w-10 h-10 object-contain">
-    <span class="text-lg md:text-xl font-bold" style="color:var(--brand-d)">Perpustakaan Al Anwar</span>
+    <span id="app-title-header" class="text-lg md:text-xl font-bold" style="color:var(--brand-d)">Perpustakaan Al Anwar</span>
   </div>   
   <button id="sync-chip" class="no-print text-xs px-3.5 py-2 rounded-full font-medium bg-gray-100 text-gray-600 transition hover:bg-gray-200">  Menyambungkan </button> 
 </header> 
-<main class="px-4 md:px-8 py-6 space-y-6"> 
+
+<main class="px-4 md:px-8 py-3 space-y-4"> 
 <!-- BERANDA --> 
 <section id="tab-home" class="hidden">   
   <div class="grid xl:grid-cols-3 gap-6">     
@@ -213,13 +209,16 @@ thead{background:#f9fafb!important}
       <div class="home-banner rounded-3xl p-6 md:p-8 text-white relative overflow-hidden shadow-sm">         
         <div id="h-date" class="text-xs bg-white/20 inline-block px-3 py-1 rounded-lg backdrop-blur-sm"></div>         
         <h2 id="h-greet" class="text-2xl md:text-3xl font-bold mt-3"></h2>         
-        <p id="h-sub" class="text-sm opacity-90 mt-1 max-w-md leading-relaxed"></p>              
+        <p id="h-sub" class="text-sm opacity-90 mt-1 max-w-md leading-relaxed"></p>         
       </div>       
       <div id="h-stats" class="grid sm:grid-cols-3 gap-4"></div>       
       <div class="grid md:grid-cols-2 gap-6">         
         <div class="bg-white rounded-2xl p-6">           
           <div class="text-[11px] font-semibold text-gray-400 tracking-wider mb-4">KETERSEDIAAN BUKU</div>           
-          <div class="flex items-center gap-5"><div id="h-donut" class="donut"><span id="h-pct"></span></div><div id="h-legend" class="flex-1 bg-gray-50 rounded-xl p-3 space-y-2 text-sm"></div></div>         
+          <div class="flex items-center gap-5">
+            <div id="h-donut" class="donut"><span id="h-pct"></span></div>
+            <div id="h-legend" class="flex-1 bg-gray-50 rounded-xl p-3 space-y-2 text-sm"></div>
+          </div>         
         </div>         
         <div class="bg-white rounded-2xl p-6">           
           <div class="text-[11px] font-semibold text-gray-400 tracking-wider mb-4">STATUS PEMINJAMAN</div>           
@@ -239,7 +238,10 @@ thead{background:#f9fafb!important}
       <div class="bg-white rounded-2xl overflow-hidden">         
         <div class="home-head"><span>KALENDER JATUH TEMPO</span><span id="h-month"></span></div>         
         <div id="h-cal" class="cal p-4"></div>         
-        <div class="border-t border-gray-100 p-4"><div class="text-[11px] font-semibold text-gray-400 tracking-wider mb-2">JATUH TEMPO   3 HARI</div><div id="h-events" class="space-y-3 text-sm"></div></div>       
+        <div class="border-t border-gray-100 p-4">
+          <div class="text-[11px] font-semibold text-gray-400 tracking-wider mb-2">JATUH TEMPO 3 HARI</div>
+          <div id="h-events" class="space-y-3 text-sm"></div>
+        </div>       
       </div>     
     </div>   
   </div> 
@@ -248,18 +250,31 @@ thead{background:#f9fafb!important}
 <!-- BUKU --> 
 <section id="tab-books" class="space-y-4">   
   <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">     
-    <div><h2 class="text-xl font-bold text-gray-800">Manajemen Buku</h2><p class="text-xs text-gray-500 mt-1 max-w-xl">Impor daftar buku dari Excel (.xlsx/.xls/.csv). Baris pertama berisi judul kolom: <b>Kode</b>, <b>Judul</b>, <b>Penulis</b>, <b>Stok</b>.</p></div>     
-    <div class="flex gap-2">
-      <button onclick="document.getElementById('bk-file').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">Impor dari Excel</button>
-      <button onclick="openBook()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">+ Tambah Buku</button>
-    </div>
+    <div>
+      <h2 class="text-xl font-bold text-gray-800">Manajemen Buku</h2>
+      <p class="text-xs text-gray-500 mt-1 max-w-xl">Impor daftar buku dari Excel (.xlsx/.xls/.csv). Baris pertama berisi judul kolom: <b>Kode</b>, <b>Judul</b>, <b>Penulis</b>, <b>Stok</b>.</p>
+    </div>     
+    <div class="flex gap-2">       
+      <button onclick="document.getElementById('bk-file').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">Impor dari Excel</button>       
+      <button onclick="openBook()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">+ Tambah Buku</button>     
+    </div>     
     <input type="file" id="bk-file" accept=".xlsx,.xls,.csv" class="hidden">   
   </div>   
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">     
-    <table class="w-full text-left text-sm"><thead class="bg-gray-50 text-gray-600 uppercase text-xs"><tr>       
-      <th class="p-4 font-semibold">Kode</th><th class="p-4 font-semibold">Judul</th><th class="p-4 font-semibold">Penulis</th><th class="p-4 font-semibold text-center">Stok</th><th class="p-4 font-semibold text-center">Tersedia</th><th class="p-4 font-semibold text-center">Aksi</th>     
-    </tr></thead><tbody id="book-body" class="divide-y divide-gray-100"></tbody></table>   
-  </div>
+    <table class="w-full text-left text-sm">
+      <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+        <tr>
+          <th class="p-4 font-semibold">Kode</th>
+          <th class="p-4 font-semibold">Judul</th>
+          <th class="p-4 font-semibold">Penulis</th>
+          <th class="p-4 font-semibold text-center">Stok</th>
+          <th class="p-4 font-semibold text-center">Tersedia</th>
+          <th class="p-4 font-semibold text-center">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="book-body" class="divide-y divide-gray-100"></tbody>
+    </table>   
+  </div> 
 </section> 
 
 <!-- ANGGOTA --> 
@@ -277,9 +292,18 @@ thead{background:#f9fafb!important}
     <input id="m-search" placeholder="Cari nama / NISN..." class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">   
   </div>   
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">     
-    <table class="w-full text-left text-sm"><thead class="bg-gray-50 text-gray-600 uppercase text-xs"><tr>       
-      <th class="p-4 font-semibold">NISN / NIP</th><th class="p-4 font-semibold">Nama</th><th class="p-4 font-semibold">Peran</th><th class="p-4 font-semibold">Kelas</th><th class="p-4 font-semibold text-center">Aksi</th>     
-    </tr></thead><tbody id="member-body" class="divide-y divide-gray-100"></tbody></table>   
+    <table class="w-full text-left text-sm">
+      <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+        <tr>
+          <th class="p-4 font-semibold">NISN / NIP</th>
+          <th class="p-4 font-semibold">Nama</th>
+          <th class="p-4 font-semibold">Peran</th>
+          <th class="p-4 font-semibold">Kelas</th>
+          <th class="p-4 font-semibold text-center">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="member-body" class="divide-y divide-gray-100"></tbody>
+    </table>   
   </div> 
 </section> 
 
@@ -309,8 +333,7 @@ thead{background:#f9fafb!important}
     </div>     
     <div id="member-card" class="hidden bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex justify-between items-center">       
       <div id="member-info"></div>       
-      <button onclick="clearMember()" class="text-sm text-indigo-700 font-medium underline">Ganti peminjam</button>     
-    </div>     
+      <button onclick="clearMember()" class="text-sm text-indigo-700 font-medium underline">Ganti peminjam</button>     </div>     
     <div id="scan-msg" class="hidden text-sm rounded-xl px-4 py-2.5"></div>   
   </div>   
   <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 space-y-3">     
@@ -324,9 +347,20 @@ thead{background:#f9fafb!important}
     <p id="loan-summary" class="text-xs text-gray-500"></p>   
   </div>   
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">     
-    <table class="w-full text-left text-sm"><thead class="bg-gray-50 text-gray-600 uppercase text-xs"><tr>       
-      <th class="p-4 font-semibold">Peminjam</th><th class="p-4 font-semibold">Judul Buku</th><th class="p-4 font-semibold text-center">Tgl Pinjam</th><th class="p-4 font-semibold text-center">Batas Kembali</th><th class="p-4 font-semibold text-center">Status</th><th class="p-4 font-semibold text-center">Denda</th><th class="p-4 font-semibold text-center">Aksi</th>     
-    </tr></thead><tbody id="loan-body" class="divide-y divide-gray-100"></tbody></table>   
+    <table class="w-full text-left text-sm">
+      <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+        <tr>
+          <th class="p-4 font-semibold">Peminjam</th>
+          <th class="p-4 font-semibold">Judul Buku</th>
+          <th class="p-4 font-semibold text-center">Tgl Pinjam</th>
+          <th class="p-4 font-semibold text-center">Batas Kembali</th>
+          <th class="p-4 font-semibold text-center">Status</th>
+          <th class="p-4 font-semibold text-center">Denda</th>
+          <th class="p-4 font-semibold text-center">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="loan-body" class="divide-y divide-gray-100"></tbody>
+    </table>   
   </div> 
 </section> 
 
@@ -334,7 +368,10 @@ thead{background:#f9fafb!important}
 <section id="tab-recap" class="space-y-4 hidden">   
   <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">     
     <div class="no-print flex flex-wrap justify-between items-center gap-4">       
-      <div><h2 class="text-xl font-bold text-gray-800">Rekap Perpustakaan</h2><p class="text-xs text-gray-500 mt-1">Ringkasan dan daftar lengkap buku, anggota, serta peminjaman.</p></div>       
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Rekap Perpustakaan</h2>
+        <p class="text-xs text-gray-500 mt-1">Ringkasan dan daftar lengkap buku, anggota, serta peminjaman.</p>
+      </div>       
       <button onclick="exportAll()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">Ekspor Semua (Excel)</button>     
     </div>     
     <div id="recap-stats" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>   
@@ -343,31 +380,35 @@ thead{background:#f9fafb!important}
     <div class="no-print flex flex-wrap gap-2 border-b border-gray-100 pb-4">       
       <button data-r="books" class="recapbtn px-4 py-2 rounded-xl text-sm font-medium transition">Daftar Buku</button>       
       <button data-r="members" class="recapbtn px-4 py-2 rounded-xl text-sm font-medium transition">Daftar Anggota</button>       
-      <button data-r="loans" class="recapbtn px-4 py-2 rounded-xl text-sm font-medium transition">Peminjaman &amp; Pengembalian</button>     </div>     
+      <button data-r="loans" class="recapbtn px-4 py-2 rounded-xl text-sm font-medium transition">Peminjaman &amp; Pengembalian</button>     
+    </div>     
     <div class="no-print flex flex-wrap items-end gap-3">       
       <div class="flex-1 min-w-[200px]"><label class="block text-xs font-medium mb-1 text-gray-700">Cari</label><input id="r-search" autocomplete="off" placeholder="Cari..." class="w-full border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2"></div>       
       <div id="r-role-wrap" class="hidden"><label class="block text-xs font-medium mb-1 text-gray-700">Peran</label><select id="r-role" class="border border-gray-300 rounded-xl px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2"><option value="">Semua</option><option>Siswa</option><option>Guru</option></select></div>       
-      <div id="r-loan-wrap" class="hidden">         
-        <div class="flex flex-wrap items-end gap-3">           
-          <div><label class="block text-xs font-medium mb-1 text-gray-700">Status</label><select id="r-status" class="border border-gray-300 rounded-xl px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2"><option value="">Semua</option><option value="Dipinjam">Belum dikembalikan</option><option value="Terlambat">Terlambat</option><option value="Dikembalikan">Dikembalikan</option></select></div>           
-          <div><label class="block text-xs font-medium mb-1 text-gray-700">Dipinjam dari</label><input id="r-from" type="date" class="border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2"></div>           
-          <div><label class="block text-xs font-medium mb-1 text-gray-700">Sampai</label><input id="r-to" type="date" class="border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2"></div>         
+      <div id="r-loan-wrap" class="hidden">           
+        <div class="flex flex-wrap items-end gap-3">               
+          <div><label class="block text-xs font-medium mb-1 text-gray-700">Status</label><select id="r-status" class="border border-gray-300 rounded-xl px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2"><option value="">Semua</option><option value="Dipinjam">Belum dikembalikan</option><option value="Terlambat">Terlambat</option><option value="Dikembalikan">Dikembalikan</option></select></div>               
+          <div><label class="block text-xs font-medium mb-1 text-gray-700">Dipinjam dari</label><input id="r-from" type="date" class="border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2"></div>               
+          <div><label class="block text-xs font-medium mb-1 text-gray-700">Sampai</label><input id="r-to" type="date" class="border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2"></div>           
         </div>       
       </div>       
       <button onclick="resetRecapFilters()" class="text-sm text-indigo-700 font-medium underline pb-2">Reset filter</button>     
     </div>     
     <div class="no-print flex flex-wrap justify-between items-center gap-2 pt-2">       
       <span id="r-count" class="text-sm text-gray-500"></span>       
-      <div class="flex flex-wrap gap-2">         
-        <button onclick="exportRecap('xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition">Excel (.xlsx)</button>         
-        <button onclick="exportRecap('csv')" class="bg-white hover:bg-gray-50 border border-gray-300 px-4 py-2 rounded-xl text-sm font-medium transition">CSV</button>         
+      <div class="flex flex-wrap gap-2">           
+        <button onclick="exportRecap('xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition">Excel (.xlsx)</button>           
+        <button onclick="exportRecap('csv')" class="bg-white hover:bg-gray-50 border border-gray-300 px-4 py-2 rounded-xl text-sm font-medium transition">CSV</button>           
         <button onclick="window.print()" class="bg-white hover:bg-gray-50 border border-gray-300 px-4 py-2 rounded-xl text-sm font-medium transition">Cetak</button>       
       </div>     
     </div>     
     <div id="print-title" class="hidden print:block text-lg font-bold text-gray-800"></div>   
   </div>   
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">     
-    <table class="w-full text-left text-sm"><thead id="recap-head" class="bg-gray-50 text-gray-600 uppercase text-xs"></thead><tbody id="recap-body" class="divide-y divide-gray-100"></tbody></table>   
+    <table class="w-full text-left text-sm">
+      <thead id="recap-head" class="bg-gray-50 text-gray-600 uppercase text-xs"></thead>
+      <tbody id="recap-body" class="divide-y divide-gray-100"></tbody>
+    </table>   
   </div> 
 </section> 
 </main> 
@@ -376,85 +417,157 @@ thead{background:#f9fafb!important}
 
 <!-- Modal buku --> 
 <div id="book-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">   
-  <form onsubmit="saveBook(event)" class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-gray-200">     
-    <h3 id="book-title-h" class="text-xl font-bold text-gray-800"></h3>     
-    <input type="hidden" id="b-id">     
-    <input id="b-code" required placeholder="Kode buku (sesuai barcode)" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">     
-    <input id="b-title" required placeholder="Judul buku" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">     
-    <input id="b-author" required placeholder="Penulis" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">     
-    <input id="b-stock" type="number" min="1" required placeholder="Jumlah stok" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">     
-    <div class="flex justify-end gap-2 pt-2">
-      <button type="button" onclick="closeModal('book-modal')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition">Batal</button>
-      <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">Simpan</button>
+  <form onsubmit="saveBook(event)" class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-gray-200">       
+    <h3 id="book-title-h" class="text-xl font-bold text-gray-800"></h3>       
+    <input type="hidden" id="b-id">       
+    <input id="b-code" required placeholder="Kode buku (sesuai barcode)" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">       
+    <input id="b-title" required placeholder="Judul buku" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">       
+    <input id="b-author" required placeholder="Penulis" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">       
+    <input id="b-stock" type="number" min="1" required placeholder="Jumlah stok" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">       
+    <div class="flex justify-end gap-2 pt-2">       
+      <button type="button" onclick="closeModal('book-modal')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition">Batal</button>       
+      <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">Simpan</button>     
     </div>   
   </form> 
 </div> 
 
 <!-- Modal anggota --> 
 <div id="member-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">   
-  <form onsubmit="saveMember(event)" class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-gray-200">     
-    <h3 id="member-title-h" class="text-xl font-bold text-gray-800"></h3>     
-    <input type="hidden" id="m-old">     
-    <input id="m-nisn" required placeholder="NISN / NIP" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">     
-    <input id="m-name" required placeholder="Nama lengkap" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">     
-    <select id="m-role" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2"><option>Siswa</option><option>Guru</option></select>     
-    <input id="m-class" placeholder="Kelas (opsional)" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">     
-    <div class="flex justify-end gap-2 pt-2">
-      <button type="button" onclick="closeModal('member-modal')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition">Batal</button>
-      <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">Simpan</button>
+  <form onsubmit="saveMember(event)" class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-gray-200">       
+    <h3 id="member-title-h" class="text-xl font-bold text-gray-800"></h3>       
+    <input type="hidden" id="m-old">       
+    <input id="m-nisn" required placeholder="NISN / NIP" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">       
+    <input id="m-name" required placeholder="Nama lengkap" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">       
+    <select id="m-role" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2"><option>Siswa</option><option>Guru</option></select>       
+    <input id="m-class" placeholder="Kelas (opsional)" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2">       
+    <div class="flex justify-end gap-2 pt-2">       
+      <button type="button" onclick="closeModal('member-modal')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition">Batal</button>       
+      <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">Simpan</button>     
     </div>   
   </form> 
 </div> 
 
 <!-- Modal Kamera / Pemindai ZXing --> 
 <div id="cam-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">   
-  <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">     
-    <div class="flex justify-between items-center">       
-      <h3 id="cam-title" class="text-lg font-bold text-gray-800">Pindai Barcode</h3>       
-      <button onclick="stopCam()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>     
-    </div>     
-    <div class="relative overflow-hidden rounded-2xl bg-black aspect-[4/3] flex items-center justify-center">       
-      <video id="cam-video" class="w-full h-full object-cover"></video>       
-      <div class="absolute inset-0 border-2 border-dashed border-emerald-400/70 m-8 rounded-xl pointer-events-none flex items-center justify-center">         
-        <div class="w-full h-0.5 bg-red-500/80 animate-pulse"></div>       
-      </div>     
-    </div>     
-    <p class="text-xs text-center text-gray-500">Arahkan kamera ke barcode kartu anggota atau buku di dalam kotak.</p>     
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">       
+    <div class="flex justify-between items-center">           
+      <h3 id="cam-title" class="text-lg font-bold text-gray-800">Pindai Barcode</h3>           
+      <button onclick="stopCam()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>       
+    </div>       
+    <div class="relative overflow-hidden rounded-2xl bg-black aspect-[4/3] flex items-center justify-center">           
+      <video id="cam-video" class="w-full h-full object-cover"></video>           
+      <div class="absolute inset-0 border-2 border-dashed border-emerald-400/70 m-8 rounded-xl pointer-events-none flex items-center justify-center">               
+        <div class="w-full h-0.5 bg-red-500/80 animate-pulse"></div>           
+      </div>       
+    </div>       
+    <p class="text-xs text-center text-gray-500">Arahkan kamera ke barcode kartu anggota atau buku di dalam kotak.</p>       
     <button onclick="stopCam()" class="bg-gray-100 hover:bg-gray-200 font-medium px-4 py-3 rounded-xl w-full text-gray-700 text-sm transition">Tutup Kamera</button>   
   </div> 
 </div> 
 
+<!-- Modal Pengaturan / Settings -->
+<div id="settings-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-gray-200 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+      <h3 class="text-xl font-bold text-gray-800"><img src="settingsminor-svgrepo-com.svg" class="w-6 h-6">Pengaturan Sistem</h3>
+      <button onclick="closeModal('settings-modal')" class="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+    </div>
+
+    <!-- 1. Identitas Perpustakaan -->
+    <div class="space-y-3">
+      <h4 class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">1. Identitas Instansi</h4>
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">Nama Perpustakaan</label>
+        <input id="set-lib-name" class="w-full border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2">
+      </div>
+    </div>
+
+    <!-- 2. Aturan Peminjaman & Sanksi -->
+    <div class="space-y-3 pt-2 border-t border-gray-100">
+      <h4 class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">2. Aturan Peminjaman & Denda</h4>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Batas Pinjam (Hari)</label>
+          <input id="set-loan-days" type="number" min="1" class="w-full border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Denda per Hari (Rp)</label>
+          <input id="set-fine-day" type="number" min="0" step="500" class="w-full border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Koneksi GitHub Sync -->
+    <div class="space-y-3 pt-2 border-t border-gray-100">
+      <h4 class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">3. Sinkronisasi GitHub</h4>
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1">GitHub Personal Access Token (gh_token)</label>
+        <div class="flex gap-2">
+          <input id="set-gh-token" type="password" placeholder="Kosongkan jika tidak diubah" class="flex-1 border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2">
+          <button type="button" onclick="testGitHubConnection()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl text-xs font-medium transition">Uji Koneksi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Backup & Restore Data -->
+    <div class="space-y-3 pt-2 border-t border-gray-100">
+      <h4 class="text-sm font-semibold text-emerald-700 uppercase tracking-wide">4. Manajemen Data (Backup / Restore)</h4>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" onclick="exportDatabaseJson()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-medium transition">📥 Unduh Backup JSON</button>
+        <button type="button" onclick="document.getElementById('restore-file').click()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-medium transition">📤 Pulihkan Data</button>
+        <input type="file" id="restore-file" accept=".json" class="hidden" onchange="importDatabaseJson(event)">
+      </div>
+    </div>
+
+    <!-- Tombol Simpan -->
+    <div class="flex justify-end gap-2 pt-4 border-t border-gray-100">
+      <button type="button" onclick="closeModal('settings-modal')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition">Batal</button>
+      <button type="button" onclick="saveSettings()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">Simpan Pengaturan</button>
+    </div>
+  </div>
+</div>
+
 <script> 
-const GH_CONFIG = {   
-  owner: 'farizqial2-source',   
-  repo: 'pustaka-al-anwar-db',   
+const GH_CONFIG = {     
+  owner: 'farizqial2-source',     
+  repo: 'pustaka-al-anwar-db',     
   path: 'database.json' 
 };
-
-function getGhToken(forcePrompt = false) {   
-  let t = forcePrompt ? null : localStorage.getItem('gh_token');   
-  if (!t) {     
-    t = prompt('Masukkan token GitHub (hanya disimpan di perangkat ini):');     
-    if (t) localStorage.setItem('gh_token', t.trim());   
-  }
+function getGhToken(forcePrompt = false) {     
+  let t = forcePrompt ? null : localStorage.getItem('gh_token');     
+  if (!t) {         
+    t = prompt('Masukkan token GitHub (hanya disimpan di perangkat ini):');         
+    if (t) localStorage.setItem('gh_token', t.trim());     
+  }     
   return t ? t.trim() : null; 
 }
-
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }; 
-const S = {   
-  books: load('books', [     
-    { id: 'B001', code: 'MAT-01', title: 'Matematika Kelas X', author: 'Tim Kemdikbud', stock: 5, available: 5 },     
-    { id: 'B002', code: 'IND-01', title: 'Bahasa Indonesia Interaktif', author: 'Sartika Dewi', stock: 3, available: 3 }   
-  ]),   
-  members: load('members', []),   
-  loans: load('loans', []),   
+const S = {     
+  books: load('books', [         
+    { id: 'B001', code: 'MAT-01', title: 'Matematika Kelas X', author: 'Tim Kemdikbud', stock: 5, available: 5 },         
+    { id: 'B002', code: 'IND-01', title: 'Bahasa Indonesia Interaktif', author: 'Sartika Dewi', stock: 3, available: 3 }     
+  ]),     
+  members: load('members', []),     
+  loans: load('loans', []),     
   updatedAt: load('updatedAt', 0) 
-};
+}; 
+
+// Pengaturan Dinamis Aplikasi (Disimpan di localStorage)
+let APP_SETTINGS = load('app_settings', {
+  libName: 'Perpustakaan Al Anwar',
+  loanDays: 14,
+  finePerDay: 2000
+});
+
+function applyAppSettings() {
+  const titleEl = document.getElementById('app-title-header');
+  if (titleEl) titleEl.textContent = APP_SETTINGS.libName;
+  document.title = APP_SETTINGS.libName;
+}
 
 let ghSyncing = false, ghTimer = null, ghAsked = false, ghPending = false, ghAlerted = false; 
 let ghBase = +localStorage.getItem('gh_base') || 0;       
 let ghDirty = localStorage.getItem('gh_dirty') === '1';   
-
 const setDirty = v => { ghDirty = v; try { localStorage.setItem('gh_dirty', v ? '1' : '0'); } catch (e) {} }; 
 const setBase = v => { ghBase = v; try { localStorage.setItem('gh_base', String(v)); } catch (e) {} }; 
 const ghUrl = () => `https://api.github.com/repos/${GH_CONFIG.owner}/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`; 
@@ -462,360 +575,429 @@ const b64d = t => decodeURIComponent(escape(atob(t.replace(/\s/g, ''))));
 const b64e = t => btoa(unescape(encodeURIComponent(t))); 
 const countRecords = d => (d.books || []).length + (d.members || []).length + (d.loans || []).length; 
 
-function setSync(state, tip) {   
-  const c = $('sync-chip'); if (!c) return;   
-  const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });   
-  const map = {     
-    ok: ['  Tersinkron ' + time, 'bg-emerald-100 text-emerald-800'],     
-    busy: ['  Menyinkronkan ', 'bg-gray-100 text-gray-600'],     
-    pending: ['  Menunggu sinkron ', 'bg-amber-100 text-amber-800'],     
-    off: ['  Belum tersambung (ketuk)', 'bg-red-100 text-red-800'],     
-    err: ['  Gagal sinkron (ketuk)', 'bg-red-100 text-red-800']   
-  };   
-  c.textContent = map[state][0]; c.title = tip || '';   
+function setSync(state, tip) {     
+  const c = $('sync-chip'); if (!c) return;     
+  const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });     
+  const map = {         
+    ok: ['  Tersinkron ' + time, 'bg-emerald-100 text-emerald-800'],         
+    busy: ['  Menyinkronkan ', 'bg-gray-100 text-gray-600'],         
+    pending: ['  Menunggu sinkron ', 'bg-amber-100 text-amber-800'],         
+    off: ['  Belum tersambung (ketuk)', 'bg-red-100 text-red-800'],         
+    err: ['  Gagal sinkron (ketuk)', 'bg-red-100 text-red-800']     
+  };     
+  c.textContent = map[state][0]; c.title = tip || '';     
   c.className = 'no-print text-xs px-3.5 py-2 rounded-full font-medium transition ' + map[state][1]; 
-}
-
+} 
 const persistLocal = () => { try { for (const k in S) localStorage.setItem(k, JSON.stringify(S[k])); } catch (e) {} }; 
-
-function refreshUI() {   
-  if (curMember) curMember = S.members.find(m => m.nisn === curMember.nisn) || null;   
+function refreshUI() {     
+  if (curMember) curMember = S.members.find(m => m.nisn === curMember.nisn) || null;     
   renderBooks(); renderMembers(); renderLoans(); fillPick(); showMember(); renderRecap(); renderHome(); 
-}
-
-function applyRemote(r) {   
-  S.books = r.books || []; S.members = r.members || []; S.loans = r.loans || []; S.updatedAt = r.updatedAt || 0;   
+} 
+function applyRemote(r) {     
+  S.books = r.books || []; S.members = r.members || []; S.loans = r.loans || []; S.updatedAt = r.updatedAt || 0;     
   persistLocal(); setBase(S.updatedAt); setDirty(false); refreshUI(); 
-}
-
-function mergeData(remote, local) {   
-  const union = (a, b, key, pick) => {     
-    const m = new Map(); (a || []).forEach(x => m.set(x[key], x));     
-    (b || []).forEach(x => m.set(x[key], pick && m.has(x[key]) ? pick(m.get(x[key]), x) : x));     
-    return [...m.values()];   
-  };   
-  const rank = l => l.status === 'Dikembalikan' ? 1 : 0;   
-  const loans = union(remote.loans, local.loans, 'id', (r, l) => rank(r) > rank(l) ? r : l).sort((a, b) => loanTs(b) - loanTs(a));   
-  const active = {}; loans.forEach(l => { if (l.status === 'Dipinjam') active[l.bookId] = (active[l.bookId] || 0) + 1; });   
-  const books = union(remote.books, local.books, 'id').map(b => ({ ...b, available: Math.max(0, (+b.stock || 0) - (active[b.id] || 0)) }));   
+} 
+function mergeData(remote, local) {     
+  const union = (a, b, key, pick) => {         
+    const m = new Map(); (a || []).forEach(x => m.set(x[key], x));         
+    (b || []).forEach(x => m.set(x[key], pick && m.has(x[key]) ? pick(m.get(x[key]), x) : x));         
+    return [...m.values()];     
+  };     
+  const rank = l => l.status === 'Dikembalikan' ? 1 : 0;     
+  const loans = union(remote.loans, local.loans, 'id', (r, l) => rank(r) > rank(l) ? r : l).sort((a, b) => loanTs(b) - loanTs(a));     
+  const active = {}; loans.forEach(l => { if (l.status === 'Dipinjam') active[l.bookId] = (active[l.bookId] || 0) + 1; });     
+  const books = union(remote.books, local.books, 'id').map(b => ({ ...b, available: Math.max(0, (+b.stock || 0) - (active[b.id] || 0)) }));     
   S.books = books; S.members = union(remote.members, local.members, 'nisn'); S.loans = loans; 
-}
-
-async function ghGet(token) {   
-  const headers = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' };   
-  const res = await fetch(ghUrl(), { headers, cache: 'no-store' });   
-  if (res.status === 404) return { remote: null, sha: undefined };   
-  if (!res.ok) throw new Error('GET ' + res.status);   
-  const j = await res.json();   
-  const text = j.content ? b64d(j.content)     : await (await fetch(ghUrl(), { headers: { ...headers, 'Accept': 'application/vnd.github.raw+json' }, cache: 'no-store' })).text();   
-  let remote; try { remote = JSON.parse(text); } catch (e) { throw new Error('Isi database.json tidak valid'); }   
+} 
+async function ghGet(token) {     
+  const headers = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' };     
+  const res = await fetch(ghUrl(), { headers, cache: 'no-store' });     
+  if (res.status === 404) return { remote: null, sha: undefined };     
+  if (!res.ok) throw new Error('GET ' + res.status);     
+  const j = await res.json();     
+  const text = j.content ? b64d(j.content) : await (await fetch(ghUrl(), { headers: { ...headers, 'Accept': 'application/vnd.github.raw+json' }, cache: 'no-store' })).text();     
+  let remote; try { remote = JSON.parse(text); } catch (e) { throw new Error('Isi database.json tidak valid'); }     
   return { remote, sha: j.sha }; 
-}
-
-async function syncGitHub(manual = false) {   
-  if (ghSyncing) { ghPending = true; return; }   
-  let token = localStorage.getItem('gh_token');   
-  if (!token && (manual || !ghAsked)) { ghAsked = true; token = getGhToken(); }   
-  if (!token) return setSync('off');   
-  ghSyncing = true; setSync('busy');   
-  try {     
-    let done = false;     
-    for (let n = 0; n < 3 && !done; n++) {       
-      const startTs = S.updatedAt;       
-      const { remote, sha } = await ghGet(token);       
-      if (S.updatedAt !== startTs) continue;                
-      let push = false;       
-      if (!remote) push = true;       
-      else {         
-        const R = remote.updatedAt || 0;         
-        if (R === 0 && ghBase === 0) {                      
-          if (countRecords(S) > countRecords(remote)) push = true; else applyRemote(remote);         
-        } else if (R === ghBase) push = ghDirty;            
-        else if (!ghDirty) applyRemote(remote);             
-        else { mergeData(remote, S); S.updatedAt = Date.now(); persistLocal(); push = true; }   
-      }       
-      if (push) {         
-        if (!S.updatedAt) { S.updatedAt = Date.now(); persistLocal(); }         
-        const sent = S.updatedAt;         
-        const res = await fetch(ghUrl(), {           
-          method: 'PUT',           
-          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },           
-          body: JSON.stringify({ message: 'Update otomatis data perpustakaan dari web', content: b64e(JSON.stringify(S, null, 2)), sha })         });         
-        if (res.status === 409 || res.status === 422) continue;   
-        if (!res.ok) throw new Error('PUT ' + res.status);         
-        setBase(sent);         
-        if (S.updatedAt === sent) setDirty(false); else ghPending = true;       
-      }       
-      done = true;     
-    }     
-    if (!done) throw new Error('Sinkronisasi berulang kali bentrok');     
-    ghAlerted = false; setSync('ok');   
-  } catch (err) {     
-    console.error('Gagal menyinkronkan data ke GitHub:', err);     
-    if (/ 401| 403/.test(err.message)) {       
-      localStorage.removeItem('gh_token'); ghAsked = false; setSync('off', err.message);       
-      if (!ghAlerted) { ghAlerted = true; alert('Token GitHub ditolak atau kedaluwarsa. Data tetap aman di perangkat ini.'); }     } else if (/ 404/.test(err.message)) {       
-      setSync('err', 'Repo atau file tidak ditemukan.');     } else setSync('err', err.message);   
-  } finally {     
-    ghSyncing = false;     
-    if (ghPending) { ghPending = false; setTimeout(() => syncGitHub(), 500); } 
-  }
-}
-
+} 
+async function syncGitHub(manual = false) {     
+  if (ghSyncing) { ghPending = true; return; }     
+  let token = localStorage.getItem('gh_token');     
+  if (!token && (manual || !ghAsked)) { ghAsked = true; token = getGhToken(); }     
+  if (!token) return setSync('off');     
+  ghSyncing = true; setSync('busy');     
+  try {         
+    let done = false;         
+    for (let n = 0; n < 3 && !done; n++) {             
+      const startTs = S.updatedAt;             
+      const { remote, sha } = await ghGet(token);             
+      if (S.updatedAt !== startTs) continue;                      
+      let push = false;             
+      if (!remote) push = true;             
+      else {                 
+        const R = remote.updatedAt || 0;                 
+        if (R === 0 && ghBase === 0) {                                
+          if (countRecords(S) > countRecords(remote)) push = true; else applyRemote(remote);                 
+        } else if (R === ghBase) push = ghDirty;                    
+        else if (!ghDirty) applyRemote(remote);                     
+        else { mergeData(remote, S); S.updatedAt = Date.now(); persistLocal(); push = true; }         
+      }             
+      if (push) {                 
+        if (!S.updatedAt) { S.updatedAt = Date.now(); persistLocal(); }                 
+        const sent = S.updatedAt;                 
+        const res = await fetch(ghUrl(), {                     
+          method: 'PUT',                     
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },                     
+          body: JSON.stringify({ message: 'Update otomatis data perpustakaan dari web', content: b64e(JSON.stringify(S, null, 2)), sha })         
+        });                 
+        if (res.status === 409 || res.status === 422) continue;           
+        if (!res.ok) throw new Error('PUT ' + res.status);                 
+        setBase(sent);                 
+        if (S.updatedAt === sent) setDirty(false); else ghPending = true;             
+      }             
+      done = true;         
+    }         
+    if (!done) throw new Error('Sinkronisasi berulang kali bentrok');         
+    ghAlerted = false; setSync('ok');     
+  } catch (err) {         
+    console.error('Gagal menyinkronkan data ke GitHub:', err);         
+    if (/ 401| 403/.test(err.message)) {             
+      localStorage.removeItem('gh_token'); ghAsked = false; setSync('off', err.message);             
+      if (!ghAlerted) { ghAlerted = true; alert('Token GitHub ditolak atau kedaluwarsa. Data tetap aman di perangkat ini.'); }     
+    } else if (/ 404/.test(err.message)) {             
+      setSync('err', 'Repo atau file tidak ditemukan.');     
+    } else setSync('err', err.message);     
+  } finally {         
+    ghSyncing = false;         
+    if (ghPending) { ghPending = false; setTimeout(() => syncGitHub(), 500); }     
+  } 
+} 
 const saveDebounced = () => { if (localStorage.getItem('gh_token')) setSync('pending'); clearTimeout(ghTimer); ghTimer = setTimeout(() => syncGitHub(), 2000); }; 
-const save = () => {   
-  S.updatedAt = Date.now(); setDirty(true); persistLocal();   
+const save = () => {     
+  S.updatedAt = Date.now(); setDirty(true); persistLocal();     
   saveDebounced(); 
 }; 
-
 const $ = id => document.getElementById(id); 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); 
 const norm = s => String(s ?? '').trim().toLowerCase(); 
 const closeModal = id => { $(id).classList.add('hidden'); $(id).classList.remove('flex'); }; 
 const showModal = id => { $(id).classList.remove('hidden'); $(id).classList.add('flex'); }; 
 
-function switchTab(t) {   
-  ['home', 'books', 'members', 'loans', 'recap'].forEach(x => $('tab-' + x).classList.toggle('hidden', x !== t));   
-  document.querySelectorAll('.side .tabbtn').forEach(b => b.classList.toggle('bg-indigo-700', b.dataset.tab === t));   
-  if (t === 'books') renderBooks(); 
-  if (t === 'members') renderMembers(); 
-  if (t === 'recap') renderRecap(); 
-  if (t === 'home') renderHome();   
+// Fungsi untuk membuka & menyimpan modal Setelan
+function openSettingsModal() {
+  $('set-lib-name').value = APP_SETTINGS.libName;
+  $('set-loan-days').value = APP_SETTINGS.loanDays;
+  $('set-fine-day').value = APP_SETTINGS.finePerDay;
+  $('set-gh-token').value = localStorage.getItem('gh_token') || '';
+  showModal('settings-modal');
+}
+
+function saveSettings() {
+  const libName = $('set-lib-name').value.trim();
+  const loanDays = parseInt($('set-loan-days').value) || 14;
+  const finePerDay = parseInt($('set-fine-day').value) || 2000;
+  const token = $('set-gh-token').value.trim();
+
+  if (!libName) return alert('Nama perpustakaan tidak boleh kosong.');
+
+  APP_SETTINGS = { libName, loanDays, finePerDay };
+  localStorage.setItem('app_settings', JSON.stringify(APP_SETTINGS));
+
+  if (token) {
+    localStorage.setItem('gh_token', token);
+  } else {
+    localStorage.removeItem('gh_token');
+  }
+
+  applyAppSettings();
+  closeModal('settings-modal');
+  refreshUI();
+  alert('Pengaturan berhasil disimpan!');
+  syncGitHub(true);
+}
+
+async function testGitHubConnection() {
+  const token = $('set-gh-token').value.trim() || localStorage.getItem('gh_token');
+  if (!token) return alert('Masukkan token GitHub terlebih dahulu.');
+  try {
+    const headers = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' };
+    const res = await fetch(`https://api.github.com/repos/${GH_CONFIG.owner}/${GH_CONFIG.repo}`, { headers });
+    if (res.ok) {
+      alert('Koneksi ke repository GitHub berhasil dan token valid!');
+    } else {
+      alert('Koneksi gagal. Periksa kembali token atau akses repository.');
+    }
+  } catch (err) {
+    alert('Terjadi kesalahan jaringan saat menguji koneksi.');
+  }
+}
+
+function exportDatabaseJson() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(S, null, 2));
+  const dlAnchor = document.createElement('a');
+  dlAnchor.setAttribute("href", dataStr);
+  dlAnchor.setAttribute("download", `backup_perpustakaan_${stamp()}.json`);
+  document.body.appendChild(dlAnchor);
+  dlAnchor.click();
+  dlAnchor.remove();
+}
+
+function importDatabaseJson(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.books && imported.members && imported.loans) {
+        if (confirm('Pulihkan data dari file backup? Data saat ini akan diperbarui.')) {
+          S.books = imported.books;
+          S.members = imported.members;
+          S.loans = imported.loans;
+          save();
+          refreshUI();
+          alert('Data berhasil dipulihkan!');
+          closeModal('settings-modal');
+        }
+      } else {
+        alert('Format file JSON tidak valid.');
+      }
+    } catch (err) {
+      alert('Gagal membaca file JSON.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function switchTab(t) {     
+  ['home', 'books', 'members', 'loans', 'recap'].forEach(x => $('tab-' + x).classList.toggle('hidden', x !== t));     
+  document.querySelectorAll('.side .tabbtn[data-tab]').forEach(b => b.classList.toggle('bg-indigo-700', b.dataset.tab === t));     
+  if (t === 'books') renderBooks();   
+  if (t === 'members') renderMembers();   
+  if (t === 'recap') renderRecap();   
+  if (t === 'home') renderHome();     
   if (t === 'loans') { renderLoans(); fillPick(); $(curMember ? 'scan-book' : 'scan-member').focus(); } 
+} 
+document.querySelectorAll('.side .tabbtn[data-tab]').forEach(b => b.onclick = () => switchTab(b.dataset.tab)); 
+
+function renderBooks() {     
+  $('book-body').innerHTML = S.books.length ? S.books.map(b => `<tr class="hover:bg-gray-50/50 transition">         
+    <td class="p-4 font-mono text-gray-600">${esc(b.code)}</td>
+    <td class="p-4 font-semibold text-gray-800">${esc(b.title)}</td>
+    <td class="p-4 text-gray-600">${esc(b.author)}</td>         
+    <td class="p-4 text-center text-gray-600">${b.stock}</td>
+    <td class="p-4 text-center font-bold" style="color:var(--brand)">${b.available}</td>         
+    <td class="p-4 text-center space-x-2"><button onclick="openBook('${b.id}')" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</button><button onclick="delBook('${b.id}')" class="text-red-600 hover:text-red-800 font-medium">Hapus</button></td>
+  </tr>`).join('') : '<tr><td colspan="6" class="p-6 text-center text-gray-400">Belum ada data buku.</td></tr>'; 
 }
-
-document.querySelectorAll('.side .tabbtn').forEach(b => b.onclick = () => switchTab(b.dataset.tab)); 
-
-function renderBooks() {   
-  $('book-body').innerHTML = S.books.length ? S.books.map(b => `<tr class="hover:bg-gray-50/50 transition">     
-    <td class="p-4 font-mono text-gray-600">${esc(b.code)}</td><td class="p-4 font-semibold text-gray-800">${esc(b.title)}</td><td class="p-4 text-gray-600">${esc(b.author)}</td>     
-    <td class="p-4 text-center text-gray-600">${b.stock}</td><td class="p-4 text-center font-bold" style="color:var(--brand)">${b.available}</td>     
-    <td class="p-4 text-center space-x-2"><button onclick="openBook('${b.id}')" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</button><button onclick="delBook('${b.id}')" class="text-red-600 hover:text-red-800 font-medium">Hapus</button></td></tr>`).join('')     
-    : '<tr><td colspan="6" class="p-6 text-center text-gray-400">Belum ada data buku.</td></tr>'; 
-}
-
-function openBook(id) {   
-  const b = S.books.find(x => x.id === id);   
-  $('book-title-h').textContent = b ? 'Edit Buku' : 'Tambah Buku Baru';   
-  $('b-id').value = b ? b.id : ''; $('b-code').value = b ? b.code : ''; $('b-title').value = b ? b.title : '';   
-  $('b-author').value = b ? b.author : ''; $('b-stock').value = b ? b.stock : '';   
+function openBook(id) {     
+  const b = S.books.find(x => x.id === id);     
+  $('book-title-h').textContent = b ? 'Edit Buku' : 'Tambah Buku Baru';     
+  $('b-id').value = b ? b.id : ''; $('b-code').value = b ? b.code : ''; $('b-title').value = b ? b.title : '';     
+  $('b-author').value = b ? b.author : ''; $('b-stock').value = b ? b.stock : '';     
   showModal('book-modal'); 
 }
-
-function saveBook(e) {   
-  e.preventDefault();   
-  const id = $('b-id').value, stock = parseInt($('b-stock').value);   
-  const d = { code: $('b-code').value.trim(), title: $('b-title').value.trim(), author: $('b-author').value.trim(), stock };   
-  if (S.books.some(b => b.id !== id && norm(b.code) === norm(d.code))) return alert('Kode buku sudah dipakai.');   
-  if (id) { const b = S.books.find(x => x.id === id); const diff = stock - b.stock; Object.assign(b, d); b.available = Math.max(0, b.available + diff); }   
-  else S.books.push({ id: 'B' + Date.now(), ...d, available: stock });   
+function saveBook(e) {     
+  e.preventDefault();     
+  const id = $('b-id').value, stock = parseInt($('b-stock').value);     
+  const d = { code: $('b-code').value.trim(), title: $('b-title').value.trim(), author: $('b-author').value.trim(), stock };     
+  if (S.books.some(b => b.id !== id && norm(b.code) === norm(d.code))) return alert('Kode buku sudah dipakai.');     
+  if (id) { const b = S.books.find(x => x.id === id); const diff = stock - b.stock; Object.assign(b, d); b.available = Math.max(0, b.available + diff); }     
+  else S.books.push({ id: 'B' + Date.now(), ...d, available: stock });     
   save(); closeModal('book-modal'); renderBooks(); 
-}
-
-function delBook(id) {   
-  if (S.loans.some(l => l.bookId === id && l.status === 'Dipinjam')) return alert('Buku ini masih dipinjam.');   
+} 
+function delBook(id) {     
+  if (S.loans.some(l => l.bookId === id && l.status === 'Dipinjam')) return alert('Buku ini masih dipinjam.');     
   if (confirm('Yakin menghapus buku ini?')) { S.books = S.books.filter(b => b.id !== id); save(); renderBooks(); } 
-}
-
-$('bk-file').onchange = async e => {   
-  const f = e.target.files[0]; e.target.value = '';   
-  if (!f) return;   
-  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat.');   
-  try {     
-    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });     
-    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: false });     
-    let added = 0, updated = 0, skipped = 0;     
-    rows.forEach(r => {       
-      const g = (...keys) => { for (const k in r) if (keys.some(x => norm(k).includes(x))) return String(r[k]).trim(); return ''; };       
-      const code = g('kode'), title = g('judul'), author = g('penulis', 'pengarang'), stock = parseInt(g('stok', 'jumlah'));       
-      if (!code || !title || !(stock > 0)) { skipped++; return; }       
-      const b = S.books.find(x => norm(x.code) === norm(code));       
-      if (b) {         
-        const diff = stock - b.stock;         
-        Object.assign(b, { title, author: author || b.author, stock });         
-        b.available = Math.max(0, b.available + diff); updated++;       
-      } else {         
-        S.books.push({ id: 'B' + Date.now() + '_' + S.books.length, code, title, author, stock, available: stock }); added++;       
-      }     
-    });     
-    save(); renderBooks();     
-    alert(`Impor selesai: ${added} buku ditambahkan, ${updated} diperbarui, ${skipped} dilewati.`);   
+} 
+$('bk-file').onchange = async e => {     
+  const f = e.target.files[0]; e.target.value = '';     
+  if (!f) return;     
+  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat.');     
+  try {         
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });         
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: false });         
+    let added = 0, updated = 0, skipped = 0;         
+    rows.forEach(r => {             
+      const g = (...keys) => { for (const k in r) if (keys.some(x => norm(k).includes(x))) return String(r[k]).trim(); return ''; };             
+      const code = g('kode'), title = g('judul'), author = g('penulis', 'pengarang'), stock = parseInt(g('stok', 'jumlah'));             
+      if (!code || !title || !(stock > 0)) { skipped++; return; }             
+      const b = S.books.find(x => norm(x.code) === norm(code));             
+      if (b) {                 
+        const diff = stock - b.stock;                 
+        Object.assign(b, { title, author: author || b.author, stock });                 
+        b.available = Math.max(0, b.available + diff); updated++;             
+      } else {                 
+        S.books.push({ id: 'B' + Date.now() + '_' + S.books.length, code, title, author, stock, available: stock }); added++;             
+      }         
+    });         
+    save(); renderBooks();         
+    alert(`Impor selesai: ${added} buku ditambahkan, ${updated} diperbarui, ${skipped} dilewati.`);     
   } catch (err) { alert('Gagal membaca file Excel: ' + err.message); } 
-};
+}; 
 
-function renderMembers() {   
-  const q = norm($('m-search').value);   
-  const list = S.members.filter(m => !q || norm(m.name).includes(q) || norm(m.nisn).includes(q));   
-  $('member-body').innerHTML = list.length ? list.map(m => `<tr class="hover:bg-gray-50/50 transition">     
-    <td class="p-4 font-mono text-gray-600">${esc(m.nisn)}</td><td class="p-4 font-semibold text-gray-800">${esc(m.name)}</td>     
-    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-medium ${m.role === 'Guru' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'}">${esc(m.role)}</span></td>     
-    <td class="p-4 text-gray-600">${esc(m.kelas || '-')}</td>     
-    <td class="p-4 text-center space-x-2"><button onclick="openMember('${esc(m.nisn)}')" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</button><button onclick="delMember('${esc(m.nisn)}')" class="text-red-600 hover:text-red-800 font-medium">Hapus</button></td></tr>`).join('')     
-    : '<tr><td colspan="5" class="p-6 text-center text-gray-400">Belum ada data anggota.</td></tr>'; 
+function renderMembers() {     
+  const q = norm($('m-search').value);     
+  const list = S.members.filter(m => !q || norm(m.name).includes(q) || norm(m.nisn).includes(q));     
+  $('member-body').innerHTML = list.length ? list.map(m => `<tr class="hover:bg-gray-50/50 transition">         
+    <td class="p-4 font-mono text-gray-600">${esc(m.nisn)}</td>
+    <td class="p-4 font-semibold text-gray-800">${esc(m.name)}</td>         
+    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-medium ${m.role === 'Guru' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'}">${esc(m.role)}</span></td>         
+    <td class="p-4 text-gray-600">${esc(m.kelas || '-')}</td>         
+    <td class="p-4 text-center space-x-2"><button onclick="openMember('${esc(m.nisn)}')" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</button><button onclick="delMember('${esc(m.nisn)}')" class="text-red-600 hover:text-red-800 font-medium">Hapus</button></td>
+  </tr>`).join('') : '<tr><td colspan="5" class="p-6 text-center text-gray-400">Belum ada data anggota.</td></tr>';   
   $('m-search').oninput = renderMembers; 
-}
-
-function openMember(nisn) {   
-  const m = S.members.find(x => x.nisn === nisn);   
-  $('member-title-h').textContent = m ? 'Edit Anggota' : 'Tambah Anggota';   
-  $('m-old').value = m ? m.nisn : ''; $('m-nisn').value = m ? m.nisn : ''; $('m-name').value = m ? m.name : '';   
-  $('m-role').value = m ? m.role : 'Siswa'; $('m-class').value = m ? (m.kelas || '') : '';   
+} 
+function openMember(nisn) {     
+  const m = S.members.find(x => x.nisn === nisn);     
+  $('member-title-h').textContent = m ? 'Edit Anggota' : 'Tambah Anggota';     
+  $('m-old').value = m ? m.nisn : ''; $('m-nisn').value = m ? m.nisn : ''; $('m-name').value = m ? m.name : '';     
+  $('m-role').value = m ? m.role : 'Siswa'; $('m-class').value = m ? (m.kelas || '') : '';     
   showModal('member-modal'); 
-}
-
-function saveMember(e) {   
-  e.preventDefault();   
-  const old = $('m-old').value, nisn = $('m-nisn').value.trim();   
-  if (S.members.some(m => m.nisn !== old && norm(m.nisn) === norm(nisn))) return alert('NISN/NIP sudah terdaftar.');   
-  const d = { nisn, name: $('m-name').value.trim(), role: $('m-role').value, kelas: $('m-class').value.trim() };   
-  const i = S.members.findIndex(m => m.nisn === old);   
-  if (i >= 0) S.members[i] = d; else S.members.push(d);   
+} 
+function saveMember(e) {     
+  e.preventDefault();     
+  const old = $('m-old').value, nisn = $('m-nisn').value.trim();     
+  if (S.members.some(m => m.nisn !== old && norm(m.nisn) === norm(nisn))) return alert('NISN/NIP sudah terdaftar.');     
+  const d = { nisn, name: $('m-name').value.trim(), role: $('m-role').value, kelas: $('m-class').value.trim() };     
+  const i = S.members.findIndex(m => m.nisn === old);     
+  if (i >= 0) S.members[i] = d; else S.members.push(d);     
   save(); closeModal('member-modal'); renderMembers(); 
-}
-
-function delMember(nisn) {   
-  if (S.loans.some(l => l.nisn === nisn && l.status === 'Dipinjam')) return alert('Anggota ini masih memiliki buku yang belum dikembalikan.');   
+} 
+function delMember(nisn) {     
+  if (S.loans.some(l => l.nisn === nisn && l.status === 'Dipinjam')) return alert('Anggota ini masih memiliki buku yang belum dikembalikan.');     
   if (confirm('Yakin menghapus anggota ini?')) { S.members = S.members.filter(m => m.nisn !== nisn); save(); renderMembers(); } 
-}
-
-$('xl-file').onchange = async e => {   
-  const f = e.target.files[0]; e.target.value = '';   
-  if (!f) return;   
-  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat.');   
-  try {     
-    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });     
-    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: false });     
-    let added = 0, updated = 0, skipped = 0;     
-    rows.forEach(r => {       
-      const g = (...keys) => { for (const k in r) if (keys.some(x => norm(k).includes(x))) return String(r[k]).trim(); return ''; };       
-      const name = g('nama'), nip = g('nip'), nisn = g('nisn') || nip || g('nomor', 'id');       
-      if (!name || !nisn) { skipped++; return; }       
-      const peran = norm(g('peran', 'tipe', 'status', 'jabatan'));       
-      const role = peran.includes('guru') || peran.includes('staf') || (!peran && nip && !g('nisn')) ? 'Guru' : 'Siswa';       
-      const d = { nisn, name, role, kelas: g('kelas') };       
-      const i = S.members.findIndex(m => norm(m.nisn) === norm(nisn));       
-      if (i >= 0) { S.members[i] = d; updated++; } else { S.members.push(d); added++; }     
-    });     
-    save(); renderMembers();     
-    alert(`Impor selesai: ${added} ditambahkan, ${updated} diperbarui, ${skipped} dilewati.`);   
+} 
+$('xl-file').onchange = async e => {     
+  const f = e.target.files[0]; e.target.value = '';     
+  if (!f) return;     
+  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat.');     
+  try {         
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });         
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: false });         
+    let added = 0, updated = 0, skipped = 0;         
+    rows.forEach(r => {             
+      const g = (...keys) => { for (const k in r) if (keys.some(x => norm(k).includes(x))) return String(r[k]).trim(); return ''; };             
+      const name = g('nama'), nip = g('nip'), nisn = g('nisn') || nip || g('nomor', 'id');             
+      if (!name || !nisn) { skipped++; return; }             
+      const peran = norm(g('peran', 'tipe', 'status', 'jabatan'));             
+      const role = peran.includes('guru') || peran.includes('staf') || (!peran && nip && !g('nisn')) ? 'Guru' : 'Siswa';             
+      const d = { nisn, name, role, kelas: g('kelas') };             
+      const i = S.members.findIndex(m => norm(m.nisn) === norm(nisn));             
+      if (i >= 0) { S.members[i] = d; updated++; } else { S.members.push(d); added++; }         
+    });         
+    save(); renderMembers();         
+    alert(`Impor selesai: ${added} ditambahkan, ${updated} diperbarui, ${skipped} dilewati.`);     
   } catch (err) { alert('Gagal membaca file Excel: ' + err.message); } 
-};
+}; 
 
-const LOAN_DAYS = 14;        
-const FINE_PER_DAY = 2000;   
 const DAY_MS = 86400000; 
 const rp = n => 'Rp' + Number(n || 0).toLocaleString('id-ID'); 
 const startOfDay = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); }; 
 
-function loanInfo(l) {   
-  const t = loanTs(l), due = t ? startOfDay(t) + LOAN_DAYS * DAY_MS : 0;   
-  const active = l.status === 'Dipinjam';   
-  let late = 0;   
-  if (!active && typeof l.lateDays === 'number') late = l.lateDays;            
-  else if (due) { const end = active ? Date.now() : l.returnTs; if (end) late = Math.max(0, Math.round((startOfDay(end) - due) / DAY_MS)); }   
-  const fine = !active && typeof l.fine === 'number' ? l.fine : late * FINE_PER_DAY;   
+function loanInfo(l) {     
+  const t = loanTs(l), due = t ? startOfDay(t) + APP_SETTINGS.loanDays * DAY_MS : 0;     
+  const active = l.status === 'Dipinjam';     
+  let late = 0;     
+  if (!active && typeof l.lateDays === 'number') late = l.lateDays;              
+  else if (due) { const end = active ? Date.now() : l.returnTs; if (end) late = Math.max(0, Math.round((startOfDay(end) - due) / DAY_MS)); }     
+  const fine = !active && typeof l.fine === 'number' ? l.fine : late * APP_SETTINGS.finePerDay;     
   return { due, late, fine, overdue: active && late > 0 }; 
-}
-
+} 
 let curMember = null; 
-function msg(t, ok) {   
+function msg(t, ok) {     
   const m = $('scan-msg'); m.textContent = t; m.className = 'text-sm rounded-xl px-4 py-3 ' + (ok ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'); 
-}
-
-function showMember() {   
-  $('member-card').classList.toggle('hidden', !curMember);   
-  if (!curMember) return;   
-  const n = S.loans.filter(l => l.nisn === curMember.nisn && l.status === 'Dipinjam').length;   
-  const od = S.loans.filter(l => l.nisn === curMember.nisn && loanInfo(l).overdue);   
-  const warn = od.length ? `<div class="text-sm font-semibold text-red-600 mt-1">${od.length} buku terlambat • denda berjalan ${rp(od.reduce((a, l) => a + loanInfo(l).fine, 0))}</div>` : '';   
+} 
+function showMember() {     
+  $('member-card').classList.toggle('hidden', !curMember);     
+  if (!curMember) return;     
+  const n = S.loans.filter(l => l.nisn === curMember.nisn && l.status === 'Dipinjam').length;     
+  const od = S.loans.filter(l => l.nisn === curMember.nisn && loanInfo(l).overdue);     
+  const warn = od.length ? `<div class="text-sm font-semibold text-red-600 mt-1">${od.length} buku terlambat • denda berjalan ${rp(od.reduce((a, l) => a + loanInfo(l).fine, 0))}</div>` : '';     
   $('member-info').innerHTML = `<div class="font-bold text-gray-800">${esc(curMember.name)}</div><div class="text-sm text-gray-600">${esc(curMember.role)} • ${esc(curMember.nisn)}${curMember.kelas ? ' • ' + esc(curMember.kelas) : ''} • meminjam ${n} buku</div>${warn}`; 
-}
-
+} 
 function clearMember() { curMember = null; showMember(); $('scan-member').value = ''; $('scan-msg').className = 'hidden'; $('scan-member').focus(); } 
-
-function setMember(v) {   
-  const m = S.members.find(x => norm(x.nisn) === norm(v));   
-  if (!m) { msg('Anggota dengan NISN/NIP "' + v.trim() + '" tidak ditemukan.', false); return; }   
+function setMember(v) {     
+  const m = S.members.find(x => norm(x.nisn) === norm(v));     
+  if (!m) { msg('Anggota dengan NISN/NIP "' + v.trim() + '" tidak ditemukan.', false); return; }     
   curMember = m; $('scan-member').value = ''; showMember(); msg('Anggota terdeteksi. Silakan scan buku.', true); $('scan-book').focus(); 
-}
-
-function doLoan(book) {   
-  if (!curMember) return msg('Scan kartu anggota terlebih dahulu.', false);   
-  if (!book) return msg('Buku tidak ditemukan.', false);   
-  if (book.available <= 0) return msg('Stok "' + book.title + '" habis.', false);   
-  if (S.loans.some(l => l.nisn === curMember.nisn && l.bookId === book.id && l.status === 'Dipinjam')) return msg('Anggota ini sudah meminjam buku tersebut.', false);   
-  book.available--;   
-  S.loans.unshift({ id: 'L' + Date.now(), nisn: curMember.nisn, borrower: curMember.name + ' (' + curMember.role + ')', bookId: book.id, bookTitle: book.title,     date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), ts: Date.now(), status: 'Dipinjam' });   
+} 
+function doLoan(book) {     
+  if (!curMember) return msg('Scan kartu anggota terlebih dahulu.', false);     
+  if (!book) return msg('Buku tidak ditemukan.', false);     
+  if (book.available <= 0) return msg('Stok "' + book.title + '" habis.', false);     
+  if (S.loans.some(l => l.nisn === curMember.nisn && l.bookId === book.id && l.status === 'Dipinjam')) return msg('Anggota ini sudah meminjam buku tersebut.', false);     
+  book.available--;     
+  S.loans.unshift({ id: 'L' + Date.now(), nisn: curMember.nisn, borrower: curMember.name + ' (' + curMember.role + ')', bookId: book.id, bookTitle: book.title,     date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }), ts: Date.now(), status: 'Dipinjam' });     
   save(); renderLoans(); fillPick(); showMember(); msg('Berhasil: "' + book.title + '" dipinjam oleh ' + curMember.name + '.', true); 
-}
-
+} 
 $('scan-member').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); setMember(e.target.value); } }; 
-$('scan-book').onkeydown = e => {   
-  if (e.key !== 'Enter') return; e.preventDefault();   
+$('scan-book').onkeydown = e => {     
+  if (e.key !== 'Enter') return; e.preventDefault();     
   doLoan(S.books.find(b => norm(b.code) === norm(e.target.value))); e.target.value = ''; e.target.focus(); 
 }; 
-
-function fillPick() {   
-  const av = S.books.filter(b => b.available > 0);   
+function fillPick() {     
+  const av = S.books.filter(b => b.available > 0);     
   $('pick-book').innerHTML = av.length ? av.map(b => `<option value="${b.id}">${esc(b.title)} (${b.available})</option>`).join('') : '<option value="">Tidak ada stok</option>'; 
-}
-
+} 
 function loanFromSelect() { doLoan(S.books.find(b => b.id === $('pick-book').value)); } 
 
 let loanFilter = 'all'; 
-
-function renderLoans() {   
-  const q = norm($('l-search').value);   
-  const all = S.loans.map(l => ({ l, i: loanInfo(l) }));   
-  const cnt = { all: all.length, out: 0, late: 0, done: 0 };   
-  let running = 0, borrowers = new Set();   
-  all.forEach(({ l, i }) => {     
-    if (l.status === 'Dipinjam') { cnt.out++; if (i.overdue) { cnt.late++; running += i.fine; borrowers.add(l.nisn); } } else cnt.done++;   
-  });   
-  const names = { all: 'Semua', out: 'Belum Dikembalikan', late: 'Terlambat', done: 'Sudah Dikembalikan' };   
-  document.querySelectorAll('.lfbtn').forEach(b => {     
-    const k = b.dataset.lf, on = k === loanFilter;     
-    b.textContent = names[k] + ' (' + cnt[k] + ')';     
-    b.classList.toggle('bg-indigo-600', on && k !== 'late'); 
-    b.classList.toggle('bg-red-600', on && k === 'late');     
-    b.classList.toggle('text-white', on); 
-    b.classList.toggle('bg-gray-100', !on); 
-    b.classList.toggle('text-gray-700', !on);   
-  });   
-  $('loan-summary').textContent = `Batas peminjaman ${LOAN_DAYS} hari • denda ${rp(FINE_PER_DAY)} per hari keterlambatan.`;   
-  const rows = all.filter(({ l, i }) =>     
-    (loanFilter === 'all' || (loanFilter === 'out' && l.status === 'Dipinjam') || (loanFilter === 'late' && i.overdue) || (loanFilter === 'done' && l.status !== 'Dipinjam'))     
-    && (!q || norm(l.borrower).includes(q) || norm(l.nisn).includes(q) || norm(l.bookTitle).includes(q)));   
-  $('loan-body').innerHTML = rows.length ? rows.map(({ l, i }) => {     
-    const badge = l.status === 'Dipinjam'       
-      ? (i.overdue ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Terlambat ${i.late} hari</span>` : '<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Dipinjam</span>')       : `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Dikembalikan</span>`;     
-    const fine = i.fine > 0 ? `<span class="font-semibold ${i.overdue ? 'text-red-600' : 'text-gray-700'}">${rp(i.fine)}</span>` : '-';     
-    return `<tr class="${i.overdue ? 'bg-red-50/50' : 'hover:bg-gray-50/50'} transition">     
-    <td class="p-4 font-semibold text-gray-800">${esc(l.borrower)}</td><td class="p-4 text-gray-600">${esc(l.bookTitle)}</td><td class="p-4 text-center text-gray-600">${esc(l.date)}</td>     
-    <td class="p-4 text-center text-gray-600">${i.due ? esc(fmtDate(i.due)) : '-'}</td><td class="p-4 text-center">${badge}</td><td class="p-4 text-center">${fine}</td>     
-    <td class="p-4 text-center">${l.status === 'Dipinjam' ? `<button onclick="returnBook('${l.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition">Kembalikan</button>` : '-'}</td></tr>`;   
-  }).join('') : '<tr><td colspan="7" class="p-6 text-center text-gray-400">Tidak ada data yang cocok.</td></tr>'; 
-  
-  document.querySelectorAll('.lfbtn').forEach(b => b.onclick = () => { loanFilter = b.dataset.lf; renderLoans(); }); 
+function renderLoans() {     
+  const q = norm($('l-search').value);     
+  const all = S.loans.map(l => ({ l, i: loanInfo(l) }));     
+  const cnt = { all: all.length, out: 0, late: 0, done: 0 };     
+  let running = 0, borrowers = new Set();     
+  all.forEach(({ l, i }) => {         
+    if (l.status === 'Dipinjam') { cnt.out++; if (i.overdue) { cnt.late++; running += i.fine; borrowers.add(l.nisn); } } else cnt.done++;     
+  });     
+  const names = { all: 'Semua', out: 'Belum Dikembalikan', late: 'Terlambat', done: 'Sudah Dikembalikan' };     
+  document.querySelectorAll('.lfbtn').forEach(b => {         
+    const k = b.dataset.lf, on = k === loanFilter;         
+    b.textContent = names[k] + ' (' + cnt[k] + ')';         
+    b.classList.toggle('bg-indigo-600', on && k !== 'late');     
+    b.classList.toggle('bg-red-600', on && k === 'late');         
+    b.classList.toggle('text-white', on);     
+    b.classList.toggle('bg-gray-100', !on);     
+    b.classList.toggle('text-gray-700', !on);     
+  });     
+  $('loan-summary').textContent = `Batas peminjaman ${APP_SETTINGS.loanDays} hari • denda ${rp(APP_SETTINGS.finePerDay)} per hari keterlambatan.`;     
+  const rows = all.filter(({ l, i }) =>         
+    (loanFilter === 'all' || (loanFilter === 'out' && l.status === 'Dipinjam') || (loanFilter === 'late' && i.overdue) || (loanFilter === 'done' && l.status !== 'Dipinjam'))         
+    && (!q || norm(l.borrower).includes(q) || norm(l.nisn).includes(q) || norm(l.bookTitle).includes(q)));     
+  $('loan-body').innerHTML = rows.length ? rows.map(({ l, i }) => {         
+    const badge = l.status === 'Dipinjam'             
+      ? (i.overdue ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Terlambat ${i.late} hari</span>` : '<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Dipinjam</span>')      
+      : `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Dikembalikan</span>`;         
+    const fine = i.fine > 0 ? `<span class="font-semibold ${i.overdue ? 'text-red-600' : 'text-gray-700'}">${rp(i.fine)}</span>` : '-';         
+    return `<tr class="${i.overdue ? 'bg-red-50/50' : 'hover:bg-gray-50/50'} transition">         
+      <td class="p-4 font-semibold text-gray-800">${esc(l.borrower)}</td>
+      <td class="p-4 text-gray-600">${esc(l.bookTitle)}</td>
+      <td class="p-4 text-center text-gray-600">${esc(l.date)}</td>         
+      <td class="p-4 text-center text-gray-600">${i.due ? esc(fmtDate(i.due)) : '-'}</td>
+      <td class="p-4 text-center">${badge}</td>
+      <td class="p-4 text-center">${fine}</td>         
+      <td class="p-4 text-center">${l.status === 'Dipinjam' ? `<button onclick="returnBook('${l.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition">Kembalikan</button>` : '-'}</td>
+    </tr>`;     
+  }).join('') : '<tr><td colspan="7" class="p-6 text-center text-gray-400">Tidak ada data yang cocok.</td></tr>';   
+  document.querySelectorAll('.lfbtn').forEach(b => b.onclick = () => { loanFilter = b.dataset.lf; renderLoans(); });   
   $('l-search').addEventListener('input', renderLoans); 
-}
-
-function returnBook(id) {   
-  const l = S.loans.find(x => x.id === id); if (!l) return;   
-  const i = loanInfo(l);   
-  if (!confirm('Konfirmasi pengembalian buku ini?' + (i.late > 0 ? `\n\nTerlambat ${i.late} hari. Denda: ${rp(i.fine)}` : ''))) return;   
-  l.status = 'Dikembalikan'; l.returnTs = Date.now();   
-  l.returnDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });   
-  l.lateDays = i.late; l.fine = i.fine;   
-  const b = S.books.find(x => x.id === l.bookId); if (b) b.available++;   
-  save(); renderLoans(); fillPick(); showMember();   
+} 
+function returnBook(id) {     
+  const l = S.loans.find(x => x.id === id); if (!l) return;     
+  const i = loanInfo(l);     
+  if (!confirm('Konfirmasi pengembalian buku ini?' + (i.late > 0 ? `\n\nTerlambat ${i.late} hari. Denda: ${rp(i.fine)}` : ''))) return;     
+  l.status = 'Dikembalikan'; l.returnTs = Date.now();     
+  l.returnDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });     
+  l.lateDays = i.late; l.fine = i.fine;     
+  const b = S.books.find(x => x.id === l.bookId); if (b) b.available++;     
+  save(); renderLoans(); fillPick(); showMember();     
   if (i.fine > 0) msg(`Buku dikembalikan. Denda: ${rp(i.fine)}.`, false); 
-}
+} 
 
 let recapTab = 'books'; 
-const RECAP_COLS = {   
-  books: ['Kode', 'Judul', 'Penulis', 'Stok', 'Tersedia', 'Sedang Dipinjam', 'Total Dipinjam'],   
-  members: ['NISN / NIP', 'Nama', 'Peran', 'Kelas', 'Sedang Meminjam', 'Buku Terlambat', 'Total Denda (Rp)', 'Total Peminjaman'],   
+const RECAP_COLS = {     
+  books: ['Kode', 'Judul', 'Penulis', 'Stok', 'Tersedia', 'Sedang Dipinjam', 'Total Dipinjam'],     
+  members: ['NISN / NIP', 'Nama', 'Peran', 'Kelas', 'Sedang Meminjam', 'Buku Terlambat', 'Total Denda (Rp)', 'Total Peminjaman'],     
   loans: ['No', 'NISN / NIP', 'Nama Peminjam', 'Peran', 'Kelas', 'Kode Buku', 'Judul Buku', 'Tanggal Pinjam', 'Batas Kembali', 'Tanggal Kembali', 'Terlambat (hari)', 'Denda (Rp)', 'Status'] 
 }; 
 const RECAP_NAMES = { books: 'Daftar Buku', members: 'Daftar Anggota', loans: 'Peminjaman & Pengembalian' }; 
@@ -823,221 +1005,223 @@ const RECAP_FILE = { books: 'Buku', members: 'Anggota', loans: 'Peminjaman' };
 const RECAP_CENTER = new Set(['No', 'Stok', 'Tersedia', 'Sedang Dipinjam', 'Total Dipinjam', 'Sedang Meminjam', 'Total Peminjaman', 'Buku Terlambat', 'Total Denda (Rp)', 'Terlambat (hari)', 'Denda (Rp)', 'Tanggal Pinjam', 'Batas Kembali', 'Tanggal Kembali', 'Status']); 
 const MONTHS_ID = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember']; 
 const fmtDate = ts => new Date(ts).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); 
-
-function loanTs(l) {   
-  if (l.ts) return l.ts;   
-  const m = String(l.date || '').toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);   
-  const mi = m ? MONTHS_ID.indexOf(m[2]) : -1;   
+function loanTs(l) {     
+  if (l.ts) return l.ts;     
+  const m = String(l.date || '').toLowerCase().match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);     
+  const mi = m ? MONTHS_ID.indexOf(m[2]) : -1;     
   return mi >= 0 ? new Date(+m[3], mi, +m[1]).getTime() : 0; 
-}
-
-function recapStats() {   
-  const act = S.loans.filter(l => l.status === 'Dipinjam').length;   
-  const siswa = S.members.filter(m => m.role !== 'Guru').length;   
-  const od = S.loans.map(loanInfo).filter(i => i.overdue);   
-  const recorded = S.loans.reduce((a, l) => a + (l.status !== 'Dipinjam' ? loanInfo(l).fine : 0), 0);   
-  return [     
-    { label: 'Judul Buku', value: S.books.length, sub: '' },     
-    { label: 'Total Eksemplar', value: S.books.reduce((a, b) => a + (+b.stock || 0), 0), sub: S.books.reduce((a, b) => a + (+b.available || 0), 0) + ' tersedia' },     
-    { label: 'Anggota', value: S.members.length, sub: siswa + ' siswa • ' + (S.members.length - siswa) + ' guru' },     
-    { label: 'Sedang Dipinjam', value: act, sub: '' },     
-    { label: 'Sedang Terlambat', value: od.length, sub: 'denda berjalan ' + rp(od.reduce((a, i) => a + i.fine, 0)) },     
-    { label: 'Sudah Dikembalikan', value: S.loans.length - act, sub: '' },     
-    { label: 'Total Transaksi', value: S.loans.length, sub: '' },     
-    { label: 'Denda Tercatat', value: recorded, fmt: rp(recorded), sub: 'dari pengembalian' }   ]; 
-}
-
-function recapData(kind, all = false) {   
-  const q = all ? '' : norm($('r-search').value);   
-  const has = (...v) => !q || v.some(x => norm(x).includes(q));   
-  let rows = [];   
-  if (kind === 'books') {     
-    const act = {}, tot = {};     
-    S.loans.forEach(l => { tot[l.bookId] = (tot[l.bookId] || 0) + 1; if (l.status === 'Dipinjam') act[l.bookId] = (act[l.bookId] || 0) + 1; });     
-    rows = S.books.filter(b => has(b.code, b.title, b.author)).map(b => ({       
-      'Kode': b.code, 'Judul': b.title, 'Penulis': b.author, 'Stok': b.stock, 'Tersedia': b.available,       
-      'Sedang Dipinjam': act[b.id] || 0, 'Total Dipinjam': tot[b.id] || 0     }));   
-  } else if (kind === 'members') {     
-    const role = all ? '' : $('r-role').value;     
-    const act = {}, tot = {}, lt = {}, fn = {};     
-    S.loans.forEach(l => {       
-      const i = loanInfo(l);       
-      tot[l.nisn] = (tot[l.nisn] || 0) + 1; fn[l.nisn] = (fn[l.nisn] || 0) + i.fine;       
-      if (l.status === 'Dipinjam') act[l.nisn] = (act[l.nisn] || 0) + 1;       
-      if (i.overdue) lt[l.nisn] = (lt[l.nisn] || 0) + 1;     });     
-    rows = S.members.filter(m => (!role || m.role === role) && has(m.nisn, m.name, m.kelas))       
-      .slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'id'))       
-      .map(m => ({         
-        'NISN / NIP': m.nisn, 'Nama': m.name, 'Peran': m.role, 'Kelas': m.kelas || '-',         
-        'Sedang Meminjam': act[m.nisn] || 0, 'Buku Terlambat': lt[m.nisn] || 0, 'Total Denda (Rp)': fn[m.nisn] || 0, 'Total Peminjaman': tot[m.nisn] || 0       }));   
-  } else {     
-    const st = all ? '' : $('r-status').value;     
-    const from = all || !$('r-from').value ? 0 : new Date($('r-from').value + 'T00:00:00').getTime();     
-    const to = all || !$('r-to').value ? 0 : new Date($('r-to').value + 'T23:59:59').getTime();     
-    const mm = {}, bm = {};     
-    S.members.forEach(m => mm[m.nisn] = m); S.books.forEach(b => bm[b.id] = b);     
-    rows = S.loans.filter(l => {       
-      const t = loanTs(l), i = loanInfo(l);       
-      if (st === 'Terlambat' ? !i.overdue : (st && l.status !== st)) return false;       
-      if (from && t < from) return false;       
-      if (to && t > to) return false;       
-      return has(l.nisn, l.borrower, l.bookTitle, bm[l.bookId] && bm[l.bookId].code);     }).map((l, i) => {       
-      const m = mm[l.nisn], b = bm[l.bookId], br = String(l.borrower || ''), inf = loanInfo(l);       
-      const rm = br.match(/\((Siswa|Guru)\)\s*$/);       
-      return {         
-        'No': i + 1, 'NISN / NIP': l.nisn, 'Nama Peminjam': m ? m.name : br.replace(/\s*\((Siswa|Guru)\)\s*$/, ''),         
-        'Peran': m ? m.role : (rm ? rm[1] : '-'), 'Kelas': (m && m.kelas) || '-', 'Kode Buku': b ? b.code : '-',         
-        'Judul Buku': l.bookTitle, 'Tanggal Pinjam': l.date || '-', 'Batas Kembali': inf.due ? fmtDate(inf.due) : '-', 'Tanggal Kembali': l.returnDate || '-',         
-        'Terlambat (hari)': inf.late, 'Denda (Rp)': inf.fine, 'Status': inf.overdue ? 'Terlambat' : l.status       };     });   
-  }
+} 
+function recapStats() {     
+  const act = S.loans.filter(l => l.status === 'Dipinjam').length;     
+  const siswa = S.members.filter(m => m.role !== 'Guru').length;     
+  const od = S.loans.map(loanInfo).filter(i => i.overdue);     
+  const recorded = S.loans.reduce((a, l) => a + (l.status !== 'Dipinjam' ? loanInfo(l).fine : 0), 0);     
+  return [         
+    { label: 'Judul Buku', value: S.books.length, sub: '' },         
+    { label: 'Total Eksemplar', value: S.books.reduce((a, b) => a + (+b.stock || 0), 0), sub: S.books.reduce((a, b) => a + (+b.available || 0), 0) + ' tersedia' },         
+    { label: 'Anggota', value: S.members.length, sub: siswa + ' siswa • ' + (S.members.length - siswa) + ' guru' },         
+    { label: 'Sedang Dipinjam', value: act, sub: '' },         
+    { label: 'Sedang Terlambat', value: od.length, sub: 'denda berjalan ' + rp(od.reduce((a, i) => a + i.fine, 0)) },         
+    { label: 'Sudah Dikembalikan', value: S.loans.length - act, sub: '' },         
+    { label: 'Total Transaksi', value: S.loans.length, sub: '' },         
+    { label: 'Denda Tercatat', value: recorded, fmt: rp(recorded), sub: 'dari pengembalian' }  
+  ]; 
+} 
+function recapData(kind, all = false) {     
+  const q = all ? '' : norm($('r-search').value);     
+  const has = (...v) => !q || v.some(x => norm(x).includes(q));     
+  let rows = [];     
+  if (kind === 'books') {         
+    const act = {}, tot = {};         
+    S.loans.forEach(l => { tot[l.bookId] = (tot[l.bookId] || 0) + 1; if (l.status === 'Dipinjam') act[l.bookId] = (act[l.bookId] || 0) + 1; });         
+    rows = S.books.filter(b => has(b.code, b.title, b.author)).map(b => ({             
+      'Kode': b.code, 'Judul': b.title, 'Penulis': b.author, 'Stok': b.stock, 'Tersedia': b.available,             
+      'Sedang Dipinjam': act[b.id] || 0, 'Total Dipinjam': tot[b.id] || 0     
+    }));     
+  } else if (kind === 'members') {         
+    const role = all ? '' : $('r-role').value;         
+    const act = {}, tot = {}, lt = {}, fn = {};         
+    S.loans.forEach(l => {             
+      const i = loanInfo(l);             
+      tot[l.nisn] = (tot[l.nisn] || 0) + 1; fn[l.nisn] = (fn[l.nisn] || 0) + i.fine;             
+      if (l.status === 'Dipinjam') act[l.nisn] = (act[l.nisn] || 0) + 1;             
+      if (i.overdue) lt[l.nisn] = (lt[l.nisn] || 0) + 1;     
+    });         
+    rows = S.members.filter(m => (!role || m.role === role) && has(m.nisn, m.name, m.kelas))             
+      .slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'id'))             
+      .map(m => ({                 
+        'NISN / NIP': m.nisn, 'Nama': m.name, 'Peran': m.role, 'Kelas': m.kelas || '-',                 
+        'Sedang Meminjam': act[m.nisn] || 0, 'Buku Terlambat': lt[m.nisn] || 0, 'Total Denda (Rp)': fn[m.nisn] || 0, 'Total Peminjaman': tot[m.nisn] || 0       
+      }));     
+  } else {         
+    const st = all ? '' : $('r-status').value;         
+    const from = all || !$('r-from').value ? 0 : new Date($('r-from').value + 'T00:00:00').getTime();         
+    const to = all || !$('r-to').value ? 0 : new Date($('r-to').value + 'T23:59:59').getTime();         
+    const mm = {}, bm = {};         
+    S.members.forEach(m => mm[m.nisn] = m); S.books.forEach(b => bm[b.id] = b);         
+    rows = S.loans.filter(l => {             
+      const t = loanTs(l), i = loanInfo(l);             
+      if (st === 'Terlambat' ? !i.overdue : (st && l.status !== st)) return false;             
+      if (from && t < from) return false;             
+      if (to && t > to) return false;             
+      return has(l.nisn, l.borrower, l.bookTitle, bm[l.bookId] && bm[l.bookId].code);     
+    }).map((l, i) => {             
+      const m = mm[l.nisn], b = bm[l.bookId], br = String(l.borrower || ''), inf = loanInfo(l);             
+      const rm = br.match(/\((Siswa|Guru)\)\s*$/);             
+      return {                 
+        'No': i + 1, 'NISN / NIP': l.nisn, 'Nama Peminjam': m ? m.name : br.replace(/\s*\((Siswa|Guru)\)\s*$/, ''),                 
+        'Peran': m ? m.role : (rm ? rm[1] : '-'), 'Kelas': (m && m.kelas) || '-', 'Kode Buku': b ? b.code : '-',                 
+        'Judul Buku': l.bookTitle, 'Tanggal Pinjam': l.date || '-', 'Batas Kembali': inf.due ? fmtDate(inf.due) : '-', 'Tanggal Kembali': l.returnDate || '-',                 
+        'Terlambat (hari)': inf.late, 'Denda (Rp)': inf.fine, 'Status': inf.overdue ? 'Terlambat' : l.status       
+      };     
+    });     
+  } 
   return { cols: RECAP_COLS[kind], rows }; 
-}
-
-function renderRecap() {   
-  document.querySelectorAll('.recapbtn').forEach(b => {     
-    const on = b.dataset.r === recapTab;     
-    b.classList.toggle('bg-indigo-600', on); b.classList.toggle('text-white', on);     
-    b.classList.toggle('bg-gray-100', !on); b.classList.toggle('text-gray-700', !on);   });   
-  $('r-role-wrap').classList.toggle('hidden', recapTab !== 'members');   
-  $('r-loan-wrap').classList.toggle('hidden', recapTab !== 'loans');   
-  $('recap-stats').innerHTML = recapStats().map(c => `<div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">     
-    <div class="text-xs text-gray-400 font-medium">${esc(c.label)}</div><div class="text-2xl font-bold mt-1 ${c.label === 'Sedang Terlambat' && c.value ? 'text-red-600' : 'text-gray-800'}">${c.fmt ?? c.value}</div>     
-    <div class="text-xs text-gray-400 min-h-[1rem] mt-1">${esc(c.sub)}</div></div>`).join('');   
-  const { cols, rows } = recapData(recapTab);   
-  $('r-count').textContent = rows.length + ' baris';   
-  $('print-title').textContent = 'Rekap ' + RECAP_NAMES[recapTab] + ' • Perpustakaan Al Anwar';   
-  $('recap-head').innerHTML = '<tr>' + cols.map(c => `<th class="p-4 font-semibold ${RECAP_CENTER.has(c) ? 'text-center' : ''}">${esc(c)}</th>`).join('') + '</tr>';   
-  $('recap-body').innerHTML = rows.length ? rows.map(r => '<tr class="hover:bg-gray-50/50 transition">' + cols.map((c, i) => {     
-    const v = r[c], cls = 'p-4 text-gray-600 ' + (RECAP_CENTER.has(c) ? 'text-center ' : '');     
-    if (c === 'Status') return `<td class="${cls}"><span class="px-2.5 py-1 rounded-full text-xs font-medium ${v === 'Dipinjam' ? 'bg-amber-100 text-amber-800' : v === 'Terlambat' ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${esc(v)}</span></td>`;     
-    const shown = c.endsWith('(Rp)') ? Number(v).toLocaleString('id-ID') : v;     
-    return `<td class="${cls}${i === 0 && c !== 'No' ? 'font-mono' : ''}">${esc(shown)}</td>`;   }).join('') + '</tr>').join('')     
-    : `<tr><td colspan="${cols.length}" class="p-6 text-center text-gray-400">Tidak ada data yang cocok.</td></tr>`; 
-}
-
-function resetRecapFilters() {   
-  ['r-search', 'r-role', 'r-status', 'r-from', 'r-to'].forEach(id => $(id).value = '');   
+} 
+function renderRecap() {     
+  document.querySelectorAll('.recapbtn').forEach(b => {         
+    const on = b.dataset.r === recapTab;         
+    b.classList.toggle('bg-indigo-600', on); b.classList.toggle('text-white', on);         
+    b.classList.toggle('bg-gray-100', !on); b.classList.toggle('text-gray-700', !on);   
+  });     
+  $('r-role-wrap').classList.toggle('hidden', recapTab !== 'members');     
+  $('r-loan-wrap').classList.toggle('hidden', recapTab !== 'loans');     
+  $('recap-stats').innerHTML = recapStats().map(c => `<div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">         
+    <div class="text-xs text-gray-400 font-medium">${esc(c.label)}</div>
+    <div class="text-2xl font-bold mt-1 ${c.label === 'Sedang Terlambat' && c.value ? 'text-red-600' : 'text-gray-800'}">${c.fmt ?? c.value}</div>         
+    <div class="text-xs text-gray-400 min-h-[1rem] mt-1">${esc(c.sub)}</div>
+  </div>`).join('');     
+  const { cols, rows } = recapData(recapTab);     
+  $('r-count').textContent = rows.length + ' baris';     
+  $('print-title').textContent = 'Rekap ' + RECAP_NAMES[recapTab] + ' • ' + APP_SETTINGS.libName;     
+  $('recap-head').innerHTML = '<tr>' + cols.map(c => `<th class="p-4 font-semibold ${RECAP_CENTER.has(c) ? 'text-center' : ''}">${esc(c)}</th>`).join('') + '</tr>';     
+  $('recap-body').innerHTML = rows.length ? rows.map(r => '<tr class="hover:bg-gray-50/50 transition">' + cols.map((c, i) => {         
+    const v = r[c], cls = 'p-4 text-gray-600 ' + (RECAP_CENTER.has(c) ? 'text-center ' : '');         
+    if (c === 'Status') return `<td class="${cls}"><span class="px-2.5 py-1 rounded-full text-xs font-medium ${v === 'Dipinjam' ? 'bg-amber-100 text-amber-800' : v === 'Terlambat' ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${esc(v)}</span></td>`;         
+    const shown = c.endsWith('(Rp)') ? Number(v).toLocaleString('id-ID') : v;         
+    return `<td class="${cls}${i === 0 && c !== 'No' ? 'font-mono' : ''}">${esc(shown)}</td>`;   
+  }).join('') + '</tr>').join('') : `<tr><td colspan="${cols.length}" class="p-6 text-center text-gray-400">Tidak ada data yang cocok.</td></tr>`; 
+} 
+function resetRecapFilters() {     
+  ['r-search', 'r-role', 'r-status', 'r-from', 'r-to'].forEach(id => $(id).value = '');     
   renderRecap(); 
-}
-
+} 
 ['r-search', 'r-role', 'r-status', 'r-from', 'r-to'].forEach(id => $(id).addEventListener('input', renderRecap)); 
 document.querySelectorAll('.recapbtn').forEach(b => b.onclick = () => { recapTab = b.dataset.r; renderRecap(); }); 
 
 const stamp = () => new Date().toLocaleDateString('sv-SE'); 
-function recapSheet(kind, all) {   
-  const { cols, rows } = recapData(kind, all);   
-  const ws = XLSX.utils.json_to_sheet(rows, { header: cols });   
-  ws['!cols'] = cols.map(c => ({ wch: Math.min(45, rows.reduce((m, r) => Math.max(m, String(r[c] ?? '').length), c.length) + 2) }));   
+function recapSheet(kind, all) {     
+  const { cols, rows } = recapData(kind, all);     
+  const ws = XLSX.utils.json_to_sheet(rows, { header: cols });     
+  ws['!cols'] = cols.map(c => ({ wch: Math.min(45, rows.reduce((m, r) => Math.max(m, String(r[c] ?? '').length), c.length) + 2) }));     
   return { ws, n: rows.length }; 
-}
-
-function exportRecap(ext) {   
-  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat.');   
-  const { ws, n } = recapSheet(recapTab, false);   
-  if (!n) return alert('Tidak ada data untuk diekspor.');   
-  const name = `Rekap_${RECAP_FILE[recapTab]}_${stamp()}`;   
-  if (ext === 'csv') {     
-    const blob = new Blob(['\uFEFF' + XLSX.utils.sheet_to_csv(ws)], { type: 'text/csv;charset=utf-8' });     
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + '.csv';     
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);   } else {     
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, RECAP_NAMES[recapTab]);     
-    XLSX.writeFile(wb, name + '.xlsx');   
+} 
+function exportRecap(ext) {     
+  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat.');     
+  const { ws, n } = recapSheet(recapTab, false);     
+  if (!n) return alert('Tidak ada data untuk diekspor.');     
+  const name = `Rekap_${RECAP_FILE[recapTab]}_${stamp()}`;     
+  if (ext === 'csv') {         
+    const blob = new Blob(['\uFEFF' + XLSX.utils.sheet_to_csv(ws)], { type: 'text/csv;charset=utf-8' });         
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + '.csv';         
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);   
+  } else {         
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, RECAP_NAMES[recapTab]);         
+    XLSX.writeFile(wb, name + '.xlsx');     
   } 
-}
-
-function exportAll() {   
-  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat.');   
-  const wb = XLSX.utils.book_new();   
-  const sum = recapStats().map(c => ({ 'Keterangan': c.label, 'Jumlah': c.value, 'Catatan': c.sub }));   
-  const wsSum = XLSX.utils.json_to_sheet(sum, { header: ['Keterangan', 'Jumlah', 'Catatan'] });   
-  wsSum['!cols'] = [{ wch: 24 }, { wch: 10 }, { wch: 24 }];   
-  XLSX.utils.book_append_sheet(wb, wsSum, 'Ringkasan');   
-  ['books', 'members', 'loans'].forEach(k => XLSX.utils.book_append_sheet(wb, recapSheet(k, true).ws, RECAP_NAMES[k]));   
+} 
+function exportAll() {     
+  if (typeof XLSX === 'undefined') return alert('Pustaka Excel gagal dimuat.');     
+  const wb = XLSX.utils.book_new();     
+  const sum = recapStats().map(c => ({ 'Keterangan': c.label, 'Jumlah': c.value, 'Catatan': c.sub }));     
+  const wsSum = XLSX.utils.json_to_sheet(sum, { header: ['Keterangan', 'Jumlah', 'Catatan'] });     
+  wsSum['!cols'] = [{ wch: 24 }, { wch: 10 }, { wch: 24 }];     
+  XLSX.utils.book_append_sheet(wb, wsSum, 'Ringkasan');     
+  ['books', 'members', 'loans'].forEach(k => XLSX.utils.book_append_sheet(wb, recapSheet(k, true).ws, RECAP_NAMES[k]));     
   XLSX.writeFile(wb, `Rekap_Perpustakaan_${stamp()}.xlsx`); 
-}
+} 
 
-function renderHome() {   
-  const now = new Date(), hr = now.getHours(), t0 = startOfDay(Date.now());   
-  $('h-greet').textContent = (hr < 11 ? 'Selamat pagi' : hr < 15 ? 'Selamat siang' : hr < 18 ? 'Selamat sore' : 'Selamat malam') + ', Petugas Perpustakaan!';   
-  $('h-date').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });   
-  const act = S.loans.filter(l => l.status === 'Dipinjam').map(l => ({ l, i: loanInfo(l) }));   
-  const od = act.filter(x => x.i.overdue), dueToday = act.filter(x => x.i.due && startOfDay(x.i.due) === t0);   
-  $('h-sub').textContent = (od.length || dueToday.length) ? `${dueToday.length} buku jatuh tempo hari ini • ${od.length} buku terlambat dikembalikan.` : 'Semua peminjaman aman hari ini. Semoga harimu menyenangkan!';   
-  const eks = S.books.reduce((a, b) => a + (+b.stock || 0), 0), av = S.books.reduce((a, b) => a + (+b.available || 0), 0);   
-  const siswa = S.members.filter(m => m.role !== 'Guru').length;   
+function renderHome() {     
+  const now = new Date(), hr = now.getHours(), t0 = startOfDay(Date.now());     
+  $('h-greet').textContent = (hr < 11 ? 'Selamat pagi' : hr < 15 ? 'Selamat siang' : hr < 18 ? 'Selamat sore' : 'Selamat malam') + ', Petugas Perpustakaan!';     
+  $('h-date').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });     
+  const act = S.loans.filter(l => l.status === 'Dipinjam').map(l => ({ l, i: loanInfo(l) }));     
+  const od = act.filter(x => x.i.overdue), dueToday = act.filter(x => x.i.due && startOfDay(x.i.due) === t0);     
+  $('h-sub').textContent = (od.length || dueToday.length) ? `${dueToday.length} buku jatuh tempo hari ini • ${od.length} buku terlambat dikembalikan.` : 'Semua peminjaman aman hari ini. Semoga harimu menyenangkan!';     
+  const eks = S.books.reduce((a, b) => a + (+b.stock || 0), 0), av = S.books.reduce((a, b) => a + (+b.available || 0), 0);     
+  const siswa = S.members.filter(m => m.role !== 'Guru').length;     
   const card = (ic, bg, label, val, sub) => `<div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm"><div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-gray-400 tracking-wider">${label}</span><span class="w-10 h-10 rounded-xl grid place-items-center" style="background:${bg}"><img src="${ic}" class="w-5 h-5"></span></div><div class="text-3xl font-bold mt-3" style="color:var(--ink)">${val}</div><div class="text-xs text-gray-500 mt-1">${sub}</div></div>`;   
-
-$('h-stats').innerHTML = card('vocabularymajor-svgrepo-com.svg', '#ecfdf5', 'JUDUL BUKU', S.books.length, eks + ' eksemplar • ' + av + ' tersedia')     
-  + card('identitycardmajor-svgrepo-com.svg', '#eff6ff', 'ANGGOTA', S.members.length, siswa + ' siswa • ' + (S.members.length - siswa) + ' guru')     
-  + card('replacemajor-svgrepo-com.svg', '#fef2f2', 'SEDANG DIPINJAM', act.length, od.length + ' terlambat');   
-  const pct = eks ? Math.round(av / eks * 100) : 0;   
-  $('h-donut').style.background = `conic-gradient(#059669 0 ${pct}%, #e5e7eb ${pct}% 100%)`;   
-  $('h-pct').textContent = pct + '%';   
-  $('h-legend').innerHTML = [['Tersedia', av, '#059669'], ['Dipinjam', act.length, '#10b981'], ['Terlambat', od.length, '#ef4444']]     
-    .map(([n, v, c]) => `<div class="flex justify-between items-center text-gray-600"><span><i class="inline-block w-2 h-2 rounded-full mr-2" style="background:${c}"></i>${n}</span><b style="color:var(--ink)">${v}</b></div>`).join('');   
-  const tot = S.loans.length, pc = n => tot ? Math.round(n / tot * 100) : 0;   
-  $('h-bars').innerHTML = [['Dikembalikan', tot - act.length, '#059669'], ['Masih dipinjam', act.length, '#10b981'], ['Terlambat', od.length, '#ef4444']]     
-    .map(([n, v, c]) => `<div><div class="flex justify-between text-sm mb-1 text-gray-600"><span>${n}</span><b class="text-gray-800">${pc(v)}%</b></div><div class="pbar"><i style="width:${pc(v)}%;background:${c}"></i></div></div>`).join('');   
-  $('h-days').textContent = LOAN_DAYS + ' hari'; $('h-fine').textContent = rp(FINE_PER_DAY); $('h-late').textContent = od.length + ' buku';   
-  
-  const y = now.getFullYear(), m = now.getMonth(), mark = {};   
-  act.forEach(({ i }) => { if (!i.due) return; const d = new Date(i.due); if (d.getFullYear() === y && d.getMonth() === m) mark[d.getDate()] = mark[d.getDate()] || i.overdue; else if (i.overdue && i.due < new Date(y, m, 1).getTime()) return; });   
-  const off = (new Date(y, m, 1).getDay() + 6) % 7, nd = new Date(y, m + 1, 0).getDate();   
-  $('h-month').textContent = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });   
-  $('h-cal').innerHTML = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map(d => `<b>${d}</b>`).join('') + '<div></div>'.repeat(off)     
-    + Array.from({ length: nd }, (_, k) => k + 1).map(d => `<div class="${d === now.getDate() ? 'today' : ''}">${d}${d in mark ? `<i class="dot ${mark[d] ? 'late' : ''}"></i>` : ''}</div>`).join('');   
-  const soon = act.filter(x => x.i.due && x.i.due <= t0 + 3 * DAY_MS).sort((a, b) => a.i.due - b.i.due).slice(0, 6);   
-  $('h-events').innerHTML = soon.length ? soon.map(({ l, i }) => {     
-    const tag = i.overdue ? `<span class="text-red-500 font-semibold">Terlambat ${i.late} hari</span>` : startOfDay(i.due) === t0 ? '<span class="text-amber-600 font-semibold">Hari ini</span>' : `<span class="text-gray-500">${Math.round((startOfDay(i.due) - t0) / DAY_MS)} hari lagi</span>`;     
-    return `<div class="flex justify-between gap-3"><div class="min-w-0"><div class="font-semibold truncate text-gray-800">${esc(l.borrower)}</div><div class="text-xs text-gray-500 truncate">${esc(l.bookTitle)}</div></div><div class="text-xs text-right shrink-0">${tag}</div></div>`;   }).join('') : '<div class="text-gray-400 text-sm">Tidak ada yang jatuh tempo dalam 3 hari ke depan.</div>'; 
-}
+  $('h-stats').innerHTML = card('vocabularymajor-svgrepo-com.svg', '#ecfdf5', 'JUDUL BUKU', S.books.length, eks + ' eksemplar • ' + av + ' tersedia')       
+    + card('identitycardmajor-svgrepo-com.svg', '#eff6ff', 'ANGGOTA', S.members.length, siswa + ' siswa • ' + (S.members.length - siswa) + ' guru')       
+    + card('replacemajor-svgrepo-com.svg', '#fef2f2', 'SEDANG DIPINJAM', act.length, od.length + ' terlambat');     
+  const pct = eks ? Math.round(av / eks * 100) : 0;     
+  $('h-donut').style.background = `conic-gradient(#059669 0 ${pct}%, #e5e7eb ${pct}% 100%)`;     
+  $('h-pct').textContent = pct + '%';     
+  $('h-legend').innerHTML = [['Tersedia', av, '#059669'], ['Dipinjam', act.length, '#10b981'], ['Terlambat', od.length, '#ef4444']]         
+    .map(([n, v, c]) => `<div class="flex justify-between items-center text-gray-600"><span><i class="inline-block w-2 h-2 rounded-full mr-2" style="background:${c}"></i>${n}</span><b style="color:var(--ink)">${v}</b></div>`).join('');     
+  const tot = S.loans.length, pc = n => tot ? Math.round(n / tot * 100) : 0;     
+  $('h-bars').innerHTML = [['Dikembalikan', tot - act.length, '#059669'], ['Masih dipinjam', act.length, '#10b981'], ['Terlambat', od.length, '#ef4444']]         
+    .map(([n, v, c]) => `<div><div class="flex justify-between text-sm mb-1 text-gray-600"><span>${n}</span><b class="text-gray-800">${pc(v)}%</b></div><div class="pbar"><i style="width:${pc(v)}%;background:${c}"></i></div></div>`).join('');     
+  $('h-days').textContent = APP_SETTINGS.loanDays + ' hari'; $('h-fine').textContent = rp(APP_SETTINGS.finePerDay); $('h-late').textContent = od.length + ' buku';     
+  const y = now.getFullYear(), m = now.getMonth(), mark = {};     
+  act.forEach(({ i }) => { if (!i.due) return; const d = new Date(i.due); if (d.getFullYear() === y && d.getMonth() === m) mark[d.getDate()] = mark[d.getDate()] || i.overdue; else if (i.overdue && i.due < new Date(y, m, 1).getTime()) return; });     
+  const off = (new Date(y, m, 1).getDay() + 6) % 7, nd = new Date(y, m + 1, 0).getDate();     
+  $('h-month').textContent = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });     
+  $('h-cal').innerHTML = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map(d => `<b>${d}</b>`).join('') + '<div></div>'.repeat(off)         
+    + Array.from({ length: nd }, (_, k) => k + 1).map(d => `<div class="${d === now.getDate() ? 'today' : ''}">${d}${d in mark ? `<i class="dot ${mark[d] ? 'late' : ''}"></i>` : ''}</div>`).join('');     
+  const soon = act.filter(x => x.i.due && x.i.due <= t0 + 3 * DAY_MS).sort((a, b) => a.i.due - b.i.due).slice(0, 6);     
+  $('h-events').innerHTML = soon.length ? soon.map(({ l, i }) => {         
+    const tag = i.overdue ? `<span class="text-red-500 font-semibold">Terlambat ${i.late} hari</span>` : startOfDay(i.due) === t0 ? '<span class="text-amber-600 font-semibold">Hari ini</span>' : `<span class="text-gray-500">${Math.round((startOfDay(i.due) - t0) / DAY_MS)} hari lagi</span>`;         
+    return `<div class="flex justify-between gap-3"><div class="min-w-0"><div class="font-semibold truncate text-gray-800">${esc(l.borrower)}</div><div class="text-xs text-gray-500 truncate">${esc(l.bookTitle)}</div></div><div class="text-xs text-right shrink-0">${tag}</div></div>`;   
+  }).join('') : '<div class="text-gray-400 text-sm">Tidak ada yang jatuh tempo dalam 3 hari ke depan.</div>'; 
+} 
 
 let codeReader = null; 
-async function startCam(target) {   
-  if (typeof ZXing === 'undefined') return alert('Pustaka pemindai kamera gagal dimuat.');   
-  $('cam-title').textContent = target === 'member' ? 'Scan Barcode Kartu Anggota' : 'Scan Barcode Buku';   
-  showModal('cam-modal');   
-  if (!codeReader) {     
-    codeReader = new ZXing.BrowserMultiFormatReader();   
-  }
-  try {     
-    const videoInputDevices = await codeReader.listVideoInputDevices();     
-    let selectedDeviceId = videoInputDevices[0]?.deviceId;          
-    const backCamera = videoInputDevices.find(device => /back|rear|environment/i.test(device.label));     
-    if (backCamera) {       
-      selectedDeviceId = backCamera.deviceId;     
-    }     
-    codeReader.decodeFromVideoDevice(selectedDeviceId, 'cam-video', (result, err) => {       
-      if (result) {         
-        const val = result.getText();         
-        stopCam();         
-        if (target === 'member') {           
-          setMember(val);         
-        } else {           
-          doLoan(S.books.find(b => norm(b.code) === norm(val)));         
-        }       
-      }     });   
-  } catch (err) {     
-    console.error(err);     
-    alert('Tidak dapat mengakses kamera smartphone.');     
-    stopCam();   
+async function startCam(target) {     
+  if (typeof ZXing === 'undefined') return alert('Pustaka pemindai kamera gagal dimuat.');     
+  $('cam-title').textContent = target === 'member' ? 'Scan Barcode Kartu Anggota' : 'Scan Barcode Buku';     
+  showModal('cam-modal');     
+  if (!codeReader) {         
+    codeReader = new ZXing.BrowserMultiFormatReader();     
+  }     
+  try {         
+    const videoInputDevices = await codeReader.listVideoInputDevices();         
+    let selectedDeviceId = videoInputDevices[0]?.deviceId;              
+    const backCamera = videoInputDevices.find(device => /back|rear|environment/i.test(device.label));         
+    if (backCamera) {             
+      selectedDeviceId = backCamera.deviceId;         
+    }         
+    codeReader.decodeFromVideoDevice(selectedDeviceId, 'cam-video', (result, err) => {             
+      if (result) {                 
+        const val = result.getText();                 
+        stopCam();                 
+        if (target === 'member') {                     
+          setMember(val);                 
+        } else {                     
+          doLoan(S.books.find(b => norm(b.code) === norm(val)));                 
+        }             
+      }     
+    });     
+  } catch (err) {         
+    console.error(err);         
+    alert('Tidak dapat mengakses kamera smartphone.');         
+    stopCam();     
   } 
-}
-
-function stopCam() {   
-  if (codeReader) {     
-    codeReader.reset();   
-  }
+} 
+function stopCam() {     
+  if (codeReader) {         
+    codeReader.reset();     
+  }     
   closeModal('cam-modal'); 
-}
+} 
 
+applyAppSettings();
 $('sync-chip').onclick = () => syncGitHub(true); 
 document.addEventListener('visibilitychange', () => { if (!document.hidden) syncGitHub(); }); 
 window.addEventListener('online', () => syncGitHub()); 
 setInterval(() => { if (!document.hidden) syncGitHub(); }, 60000); 
-
 syncGitHub(); 
-switchTab('home');
+switchTab('home'); 
 </script> 
 </body> 
 </html>

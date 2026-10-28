@@ -25,6 +25,12 @@ body{
   font-family:'Poppins','Inter',system-ui,sans-serif!important;
   color:#374151;
 }
+main {
+  padding-top: 6px !important;
+}
+main > section {
+  margin-top: 6px !important;
+}
 @media print{
   .side,.topbar,.no-print{display:none!important}
   body{background:#fff}.app{display:block}
@@ -45,35 +51,39 @@ thead{background:#f9fafb!important}
 .content{flex:1;min-width:0} 
 
 .side{
-  width: 88px;
+  width: 72px; /* Dikecilkan dari 88px */
   background: #ffffff;
   color: #4b5563;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 24px 0;
+  gap: 10px; /* Mengurangi jarak antar menu */
+  padding: 16px 0; /* Mengurangi padding atas-bawah */
   position: sticky;
   top: 16px;
   align-self: flex-start;
   height: calc(100vh - 32px);
-  border-radius: 28px;
+  border-radius: 24px;
   margin: 16px 0 16px 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
 }
 .side .tabbtn{
-  width:64px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:4px;
-  padding:10px 0;
-  border-radius:16px;
-  font-size:11px;
-  color:#6b7280;
-  background:transparent;
+  width: 54px; /* Dikecilkan agar pas */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0;
+  border-radius: 14px;
+  font-size: 10px; /* Ukuran teks sedikit lebih kecil */
+  color: #6b7280;
+  background: transparent;
   transition: all 0.2s;
+}
+.side .tabbtn img, .side .tabbtn svg {
+  width: 24px; /* Ukuran ikon diperkecil */
+  height: 24px;
 }
 .side .tabbtn .ic{font-size:21px}
 .side .tabbtn:hover{background:#f3f4f6;color:var(--brand)}
@@ -111,6 +121,70 @@ thead{background:#f9fafb!important}
 .cal .today{background:var(--brand);color:#fff;font-weight:700}
 .dot{position:absolute;bottom:2px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#10b981}
 .dot.late{background:#ef4444}
+/* Perbaikan untuk form scan agar tombol Scan pas di samping input */
+#tab-loans .flex.gap-2 {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+#tab-loans input[id^="scan-"] {
+  flex: 1;
+  min-width: 0;
+}
+#tab-loans button[onclick*="startCam"] {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Perbaikan Bottom Bar agar mengambang rapi dan tidak terpotong */
+@media(max-width:767px){
+  .app{display:block;padding-bottom:95px!important}
+  .side{
+    position:fixed!important;
+    left:12px!important;
+    right:12px!important;
+    bottom:12px!important;
+    top:auto!important;
+    width:auto!important;
+    height:auto!important;
+    flex-direction:row!important;
+    justify-content:space-around!important;
+    gap:0!important;
+    border-radius:24px!important;
+    border:1px solid #e5e7eb!important;
+    padding:8px 4px!important;
+    z-index:50!important;
+    background:#ffffff!important;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1)!important;
+  } 
+  .side .tabbtn{
+    width:auto!important;
+    flex:1!important;
+    padding:6px 0!important;
+  }
+}
+/* Memperbaiki tata letak form peminjaman agar tombol tetap berada di dalam kontainer */
+#tab-loans .grid.md\:grid-cols-2 > div {
+  overflow: hidden;
+}
+#tab-loans .flex.gap-2 {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+#tab-loans input[id^="scan-"],
+#tab-loans select#pick-button,
+#tab-loans select {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+#tab-loans button[onclick], 
+#tab-loans button.bg-emerald-600 {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 </style> 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"> 
 </head> 
@@ -891,10 +965,11 @@ function renderHome() {
   $('h-sub').textContent = (od.length || dueToday.length) ? `${dueToday.length} buku jatuh tempo hari ini • ${od.length} buku terlambat dikembalikan.` : 'Semua peminjaman aman hari ini. Semoga harimu menyenangkan!';   
   const eks = S.books.reduce((a, b) => a + (+b.stock || 0), 0), av = S.books.reduce((a, b) => a + (+b.available || 0), 0);   
   const siswa = S.members.filter(m => m.role !== 'Guru').length;   
-  const card = (ic, bg, label, val, sub) => `<div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm"><div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-gray-400 tracking-wider">${label}</span><span class="w-10 h-10 rounded-xl grid place-items-center text-lg" style="background:${bg}">${ic}</span></div><div class="text-3xl font-bold mt-3" style="color:var(--ink)">${val}</div><div class="text-xs text-gray-500 mt-1">${sub}</div></div>`;   
-  $('h-stats').innerHTML = card('📚', '#ecfdf5', 'JUDUL BUKU', S.books.length, eks + ' eksemplar • ' + av + ' tersedia')     
-    + card('👤', '#eff6ff', 'ANGGOTA', S.members.length, siswa + ' siswa • ' + (S.members.length - siswa) + ' guru')     
-    + card('🔄', '#fef2f2', 'SEDANG DIPINJAM', act.length, od.length + ' terlambat');   
+  const card = (ic, bg, label, val, sub) => `<div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm"><div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-gray-400 tracking-wider">${label}</span><span class="w-10 h-10 rounded-xl grid place-items-center" style="background:${bg}"><img src="${ic}" class="w-5 h-5"></span></div><div class="text-3xl font-bold mt-3" style="color:var(--ink)">${val}</div><div class="text-xs text-gray-500 mt-1">${sub}</div></div>`;   
+
+$('h-stats').innerHTML = card('vocabularymajor-svgrepo-com.svg', '#ecfdf5', 'JUDUL BUKU', S.books.length, eks + ' eksemplar • ' + av + ' tersedia')     
+  + card('identitycardmajor-svgrepo-com.svg', '#eff6ff', 'ANGGOTA', S.members.length, siswa + ' siswa • ' + (S.members.length - siswa) + ' guru')     
+  + card('replacemajor-svgrepo-com.svg', '#fef2f2', 'SEDANG DIPINJAM', act.length, od.length + ' terlambat');   
   const pct = eks ? Math.round(av / eks * 100) : 0;   
   $('h-donut').style.background = `conic-gradient(#059669 0 ${pct}%, #e5e7eb ${pct}% 100%)`;   
   $('h-pct').textContent = pct + '%';   

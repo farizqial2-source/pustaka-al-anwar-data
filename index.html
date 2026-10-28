@@ -89,19 +89,27 @@ thead{background:#f9fafb!important}
   height: 24px;
 }
 .side .tabbtn .ic{font-size:21px}
-.side .tabbtn:hover{background:#f3f4f6;color:var(--brand)}
-.side .tabbtn.bg-indigo-700{background:var(--brand)!important;color:#fff!important;opacity:1;box-shadow:0 6px 15px rgba(5,150,105,.25)} 
 
-/* Mengubah ikon menjadi putih bersih ketika tab aktif/dipilih */
+/* Efek hover hanya berlaku jika tombol TIDAK sedang aktif */
+.side .tabbtn:not(.bg-indigo-700):hover {
+  background: #f3f4f6;
+  color: var(--brand);
+}
+.side .tabbtn:not(.bg-indigo-700):hover img,
+.side .tabbtn:not(.bg-indigo-700):hover svg {
+  filter: brightness(0) saturate(100%) invert(43%) sepia(85%) saturate(464%) hue-rotate(125deg) brightness(95%) contrast(93%);
+}
+
+/* Tombol Aktif */
+.side .tabbtn.bg-indigo-700{
+  background: var(--brand) !important;
+  color: #fff !important;
+  opacity: 1;
+  box-shadow: 0 6px 15px rgba(5,150,105,.25);
+} 
 .side .tabbtn.bg-indigo-700 img,
 .side .tabbtn.bg-indigo-700 svg {
   filter: brightness(0) invert(1);
-}
-
-/* Mengubah warna ikon menjadi hijau saat kursor diarahkan (hover) */
-.side .tabbtn:hover img,
-.side .tabbtn:hover svg {
-  filter: brightness(0) saturate(100%) invert(43%) sepia(85%) saturate(464%) hue-rotate(125deg) brightness(95%) contrast(93%);
 }
 
 @media(max-width:767px){

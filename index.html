@@ -187,12 +187,12 @@ thead{background:#f9fafb!important}
 <aside class="side no-print">   
   <button data-tab="home" class="tabbtn"><span class="ic"><img src="homemajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Beranda</span></button>   
   <button data-tab="books" class="tabbtn"><span class="ic"><img src="vocabularymajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Buku</span></button>   
-  <button data-tab="members" class="tabbtn"><span class="ic"><img src="identitycardmajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Anggota</span></button>   
-  <button data-tab="loans" class="tabbtn"><span class="ic"><img src="replacemajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Pinjam</span></button>   
+  <button data-tab="loans" class="tabbtn"><span class="ic"><img src="replacemajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Pinjam</span></button>
+  <button data-tab="members" class="tabbtn"><span class="ic"><img src="identitycardmajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Anggota</span></button>      
   <button data-tab="recap" class="tabbtn"><span class="ic"><img src="listmajor-svgrepo-com.svg" class="w-6 h-6"></span><span>Rekap</span></button> 
 
   <!-- Bagian Bawah Sidebar (Tombol Buka Setelan) -->
-  <div style="margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-bottom: 8px; width: 100%; align-items: center;">
+  <div class="hidden md:flex" style="margin-top: auto; flex-direction: column; gap: 4px; padding-bottom: 8px; width: 100%; align-items: center;">
     <button onclick="openSettingsModal()" class="tabbtn" title="Pengaturan Sistem">
       <span class="ic" style="font-size: 18px;"><img src="settingsminor-svgrepo-com.svg" class="w-8 h-8"></span>
       <span>Setelan</span>
@@ -206,8 +206,14 @@ thead{background:#f9fafb!important}
     <img src="Logo Yayasan.png" alt="Logo Yayasan Al-Anwar" class="w-10 h-10 object-contain">
     <span id="app-title-header" class="text-lg md:text-xl font-bold" style="color:var(--brand-d)">Perpustakaan Al Anwar</span>
   </div>   
-  <button id="sync-chip" class="no-print text-xs px-3.5 py-2 rounded-full font-medium bg-gray-100 text-gray-600 transition hover:bg-gray-200">  Menyambungkan </button> 
-</header> 
+  <div class="flex items-center gap-2">
+    <button id="sync-chip" class="no-print text-xs px-3.5 py-2 rounded-full font-medium bg-gray-100 text-gray-600 transition hover:bg-gray-200">  Menyambungkan </button> 
+    <!-- Tombol Setelan Khusus Mobile di Pojok Kanan Atas -->
+    <button onclick="openSettingsModal()" class="no-print md:hidden w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition" title="Pengaturan">
+      <img src="settingsminor-svgrepo-com.svg" class="w-8 h-8">
+    </button>
+  </div>
+</header>
 
 <main class="px-4 md:px-8 py-3 space-y-4"> 
 <!-- BERANDA --> 
